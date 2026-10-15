@@ -1,6 +1,6 @@
 **Beta test feedback: Akida Docker images (REQ-TOOL-005), from Ali Kayyam**
 
-Thanks Tejaswini and Kevin for the images. Summary of my testing so far. The full report, with evidence and the documentation fixes, is attached (report.md).
+Thanks Tejaswini and Kevin for the images. Summary of my testing so far. The full report, with evidence, the test log and the documentation fixes, is in this repo: https://github.com/Brainchip-Inc/Devhub_docker_testing (start with `report.md`).
 
 **Tested:** `akida-devhub:ubuntu24.04-gpu-x86` (in depth) and `ubuntu22.04-gpu-x86`, from `172.17.0.39:5000`, on a Linux host with 2x NVIDIA A30 and **no Akida board**. DevHub was at the pinned commit `8be7c232` in both images. Douglas McLelland's testing is not included here.
 
@@ -37,3 +37,5 @@ Questions
 - Is `batch_size=1` in the benchmark loop deliberate, for hardware runs?
 
 Notebook issues (NB-1 to NB-3 in the report) can go in AK-7601 if you prefer. I can split them out.
+
+Report and plan: https://github.com/Brainchip-Inc/Devhub_docker_testing
