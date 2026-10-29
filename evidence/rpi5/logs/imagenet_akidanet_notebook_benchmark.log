@@ -1,0 +1,6 @@
+[NbConvertApp] Converting notebook brainchip_devhub/akida1/model_zoo/imagenet_akidanet/imagenet_akidanet_notebook_benchmark.ipynb to notebook
+/opt/venv/lib/python3.12/site-packages/nbformat/validator.py:434: MissingIDFieldWarning: Cell is missing an id field, this will become a hard error in future nbformat versions. You may want to use `normalize()` on your notebooks before validations (available since nbformat 5.1.4). Previous versions of nbformat are fixing this issue transparently, and will stop doing so in the future.
+  _validate(nbdict, ref, version, version_minor, relax_add_props)
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+[0;93m2026-10-29 21:08:37.396903019 [W:onnxruntime:Default, device_discovery.cc:164 DiscoverDevicesForPlatform] GPU device discovery failed: device_discovery.cc:89 ReadFileContents Failed to open file: "/sys/class/drm/card1/device/vendor"[m
+[NbConvertApp] Writing 354359 bytes to /tmp/executed/imagenet_akidanet_notebook_benchmark.ipynb

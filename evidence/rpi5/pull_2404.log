@@ -1,0 +1,8 @@
+/dev/mmcblk0p2   29G  5.4G   22G  20% /
+7060fc6891f1: Pull complete
+Digest: sha256:c533329f1a9a2d0f2f0de2dba8497ca89797ee6f0a422325d72544cf859ae9d1
+Status: Downloaded newer image for bender:5000/akida-devhub:ubuntu24.04-cpu-aarch64
+bender:5000/akida-devhub:ubuntu24.04-cpu-aarch64
+pull_seconds=267
+bender:5000/akida-devhub:ubuntu24.04-cpu-aarch64 4.1GB 15c17289d5f5
+/dev/mmcblk0p2   29G  9.4G   18G  35% /

@@ -3,15 +3,17 @@
 Internal beta test of the official Akida Docker images with DevHub pre-installed
 (REQ-TOOL-005, Jira [AK-7557](https://brainchip.atlassian.net/browse/AK-7557)).
 
-**Status: interim.** Two GPU images have been tested on a host with no Akida board.
-The CPU and aarch64 images and everything that needs a board are not yet tested.
+**Status: interim.** Two GPU images were tested on a host with no Akida board. `ubuntu24.04-cpu-aarch64`
+was tested on a Raspberry Pi 5 with an AKD1500 board (branch `test/rpi5-aarch64-images`). The other CPU
+images, the driver installer and the Secure Boot flow are not yet tested.
 
 ## What is here
 
 | File | What it is |
 |------|------------|
-| [report.md](report.md) | The test report: summary, acceptance criteria, notebook results, 24 findings, documentation fixes, recommendations and the full test log. **Start here.** |
+| [report.md](report.md) | The test report: summary, acceptance criteria, notebook results, 26 findings, documentation fixes, recommendations and the full test log. **Start here.** |
 | [plan.md](plan.md) | The test plan: objectives, phases, and facts taken from AK-7557. |
+| [evidence/rpi5/](evidence/rpi5/) | Raspberry Pi 5 run: results table, notebook run logs, device checks, and the scripts used. Executed notebooks are not copied (internal content). |
 | [jira_comment_draft.md](jira_comment_draft.md) | Draft feedback comment for AK-7557. It is a draft and has not been posted. |
 
 The documents under test (USER_GUIDE and the READMEs in `akida_docker/metatf_public_images`) are
@@ -28,8 +30,14 @@ with 2x NVIDIA A30 and no Akida board.
 - **Major issues (5, proposed):** the guide's step 2 and step 4 use different image names so `docker run`
   fails (DOC-1); `vww_notebook_benchmark` fails because its dataset is missing (NB-1); no no-board
   or GPU path in the guide (DOC-3, DOC-4); wrong notebook folder in the build README (DOC-13).
-- **Not tested:** anything that needs an Akida board, the CPU and aarch64 images, and the other
-  training notebooks. Those are reported as **not tested**, not as passed.
+- **Raspberry Pi 5 + AKD1500 (`ubuntu24.04-cpu-aarch64`):** the board is visible in the container, also
+  without `--privileged` (only `--device /dev/akd1500_0`). 5 of 6 benchmark and evaluation notebooks pass
+  with their hardware cells running on the board. `vww` fails as on x86 (NB-1). New: `speech_commands`
+  accuracy is 0.9024 on the board against 0.9306 on the software device (NB-4). Power was not measured.
+  The test Pi kills running containers on every SSH login, so use one session at a time.
+- **Not tested:** the driver installer, the Secure Boot flow, boards in x86 hosts, `ubuntu22.04-cpu-aarch64`,
+  the CPU x86 images, power measurement, and the other training notebooks. Those are reported as
+  **not tested**, not as passed.
 
 See [report.md](report.md) for evidence, severities and suggested fixes.
 

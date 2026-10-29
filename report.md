@@ -2,8 +2,8 @@
 
 - **Tester:** Ali Kayyam (Douglas McLelland covering: TBD)
 - **Requested by:** Tharak Krishnan
-- **Report status:** DRAFT, interim. The two GPU images (`ubuntu24.04-gpu-x86`, much more fully, and `ubuntu22.04-gpu-x86`) have been tested without an Akida board. The CPU and aarch64 images, and everything that needs a board, are not yet tested.
-- **Last updated:** 2026-10-15 (UTC)
+- **Report status:** DRAFT, interim. The two GPU images (`ubuntu24.04-gpu-x86`, much more fully, and `ubuntu22.04-gpu-x86`) have been tested without an Akida board. `ubuntu24.04-cpu-aarch64` has been tested on a Raspberry Pi 5 with an AKD1500 board (section 4d). The other CPU and aarch64 images, the driver installer, and the Secure Boot flow are not yet tested.
+- **Last updated:** 2026-10-29 (UTC). Raspberry Pi 5 run added (section 4d, NB-4).
 - **Plan:** [plan.md](plan.md)
 
 Rules for this file: record only what was actually run and observed. Anything not run is **Not tested**.
@@ -13,6 +13,8 @@ Rules for this file: record only what was actually run and observed. Anything no
 **Interim verdict: works for GPU training and no-board use with workarounds, but not ready to hand to external users as documented.** Severities below are proposed, for the owners to confirm.
 
 **What was tested.** Two images, on a Linux host with 2x NVIDIA A30 and no Akida board. `akida-devhub:ubuntu24.04-gpu-x86` was pulled, launched, and used to run one training notebook and six benchmark or evaluation notebooks from the Akida 1 model zoo. `akida-devhub:ubuntu22.04-gpu-x86` was pulled, checked against the same list, and ran three of those notebooks plus the quantize, convert and inference steps, with identical results (section 4c). The USER_GUIDE and the two READMEs supplied were read and checked against what actually happened.
+
+**Raspberry Pi 5 with a board (added 2026-10-29, section 4d).** `ubuntu24.04-cpu-aarch64` was pulled (267 s, 4.1 GB) and run on a Raspberry Pi 5 with an AKD1500 PCIe board. The container sees the board with the guide's `--privileged -v /dev:/dev`, and also with only `--device /dev/akd1500_0` and no privilege. Five of six benchmark and evaluation notebooks pass, and their hardware cells now run on the board (latency and clock cycles reported). `vww` fails the same way as on x86 (NB-1). **New finding NB-4:** `speech_commands` reports 0.9024 accuracy on the board against 0.9306 on the software device, while `plant_village` and `arrhythmia` match exactly. Power was not measured (no I2C power sensor). The test Pi also kills running containers on every SSH login (section 4d), which matters for anyone sharing it.
 
 **What works**
 - The image pulls (258 s), starts in about 7 s as a non-root user, and ships DevHub at the pinned commit `8be7c232` with a clean tree.
@@ -27,9 +29,9 @@ Rules for this file: record only what was actually run and observed. Anything no
 - **NB-1 (Major):** `vww_notebook_benchmark` fails out of the box. Its dataset is not in the image or downloaded by the notebook, and the README's download URL returned 403 from the test host.
 - **DOC-3, DOC-4, DOC-13 (Major):** the guide assumes a board and has no path for GPU or no-board use. It lists no host prerequisites for GPU use. The build README names notebook folders that do not exist (`akida1/notebooks/`).
 
-**Not tested.** There was no Akida board, so the PCIe/M.2 driver installer, the device passthrough flags, hardware inference, and the Secure Boot flow are untested. Also not tested: the CPU and aarch64 images, any training notebook on the 22.04 image, the three training notebooks other than `plant_village`, other operating systems, and long-run stability. The driver installer's own README was not supplied.
+**Not tested.** The PCIe/M.2 driver installer and the Secure Boot flow (the Pi already had the driver loaded), board runs on x86 hosts, the other CPU and aarch64 images (`ubuntu22.04-cpu-aarch64`, both CPU x86 images), any training notebook on the 22.04 image, the three training notebooks other than `plant_village`, power measurement, other operating systems, and long-run stability. The driver installer's own README was not supplied.
 
-**Counts (24 items, proposed severity):** 0 blockers, 5 Major (DOC-1, DOC-3, DOC-4, DOC-13, NB-1), 14 Minor, 1 Cosmetic, 3 Enhancement, and 1 checked and found fine (DOC-10).
+**Counts (26 items, proposed severity):** 0 blockers, 5 Major (DOC-1, DOC-3, DOC-4, DOC-13, NB-1), 16 Minor (including the new NB-4 and DOC-22), 1 Cosmetic, 3 Enhancement, and 1 checked and found fine (DOC-10).
 
 **Acceptance criteria:** none can be called fully met yet. Criteria 1 to 3 are partial passes for the two tested GPU images. See section 2.
 
@@ -41,7 +43,7 @@ Rules for this file: record only what was actually run and observed. Anything no
 | 2 | DevHub accessible and functional | Partial pass | JupyterLab reachable on port 8888 with token auth, all 16 notebooks listed, `brainchip_utils` imports. Notebook execution still to be tested (Phase 4). |
 | 3 | Akida workflow runs with no blocking issues | Partial pass | `plant_village` training notebook ran end to end (float training, PTQ, QAT, conversion to Akida, Akida evaluation), run by Ali. Option A notebooks: 5 of 6 pass, `vww` fails on a missing dataset (NB-1). A run on a board is still to do. |
 | 4 | Documentation reviewed | Partial | USER_GUIDE and build README read and followed for the GPU, no-board path (section 7). The driver installer README was not supplied, and the hardware sections of the guide could not be followed. |
-| 5 | Defects and enhancement requests documented | Done for what was tested | 24 items in sections 6 and 7, with fixes in section 7a. More may follow from the untested areas. |
+| 5 | Defects and enhancement requests documented | Done for what was tested | 26 items in sections 6 and 7, with fixes in section 7a. More may follow from the untested areas. |
 | 6 | Feedback shared with REQ-TOOL-005 stakeholders | Not done | |
 
 ## 3. Test environment
@@ -66,10 +68,10 @@ Rules for this file: record only what was actually run and observed. Anything no
 | SDK and toolchain availability | Partial pass | A30 host | akida 2.19.3, cnn2snn 2.19.3, quantizeml 1.2.5, akida_models 1.14.2, metatf 2.19.3, TensorFlow 2.19.1, Python 3.12.3. TensorFlow sees both GPUs. |
 | Examples and tutorials (Akida 1 model zoo) | Partial pass | A30 host, no board | `plant_village` training notebook: pass (4a). Benchmark and evaluation notebooks: 5 of 6 pass, `vww` fails (NB-1) (4b). The other training notebooks (arrhythmia, speech_commands, vww) were not run. Not run on a board. |
 | GPU training | Partial pass | A30 host | Host baseline passed (Phase 1). The `plant_village` training notebook ran with TensorFlow creating both A30s as devices, at about 21 to 22 ms per step. GPU utilisation was not captured during the run, so it is not independently confirmed. |
-| Akida hardware (AKD1500 PCIe/M.2) | Not tested | No device available | Needs another machine |
+| Akida hardware (AKD1500 PCIe/M.2) | Partial pass | Raspberry Pi 5, `ubuntu24.04-cpu-aarch64` | Board visible in the container, narrower `--device` flags work, 5 of 6 notebooks ran their hardware cells (4d). Driver installer, Secure Boot flow and power measurement not tested. Accuracy differs from software for `speech_commands` (NB-4). |
 | Documentation | Partial | A30 host, no board | USER_GUIDE and build README followed for the GPU, no-board path (section 7). Hardware sections not followed. |
 | Stability and performance | Partial | A30 host | Pull 258 s, start about 7 s, `docker stop`/`start` cycle works, and no crashes or errors in about two hours of notebook runs. First runs took 5 to 35 minutes, mostly dataset downloads. No long-run or GPU-utilisation measurements were taken. |
-| Cross-platform | Not tested | | Only Linux available |
+| Cross-platform | Partial | Raspberry Pi 5 (aarch64, Ubuntu 24.04) and x86 Linux | Only Linux. aarch64 tested on one image. |
 | Akida 2 examples | Out of beta scope | | Per the Jira |
 
 ## 4a. Notebook run: `akida1/model_zoo/plant_village/plant_village_notebook_training.ipynb`
@@ -139,6 +141,54 @@ No error cells in any of the three. Results match the 24.04 image to the digit, 
 
 An earlier attempt of mine to build a model by hand with `akida_models.akidanet_imagenet` and convert it failed with `DepthwiseConv2D is not supported for Akida conversion`. That was my test script, which did not use the repo's model builder, so it is not reported as a defect. The notebook's own calls work.
 
+## 4d. Raspberry Pi 5 with an AKD1500 board: image `ubuntu24.04-cpu-aarch64` (2026-10-29)
+
+The first run with a real board. Tested over SSH on a lab Raspberry Pi 5 that Ali was given access to. The account is a normal user that the host owner had added to the `docker` group. No `sudo` was used.
+
+| Item | Value |
+|------|-------|
+| Host | Raspberry Pi 5 Model B Rev 1.1, 4 cores, 7.8 GB RAM, Ubuntu 24.04 LTS, kernel 6.8.0-1007-raspi, aarch64 |
+| Storage | 29 GB SD card, 22 GB free at the start |
+| Docker | 27.0.3. The daemon trusts `bender:5000` as an insecure registry. |
+| Board | `PCIe/AKD1500/16MB/0`, 32 NPs, ip_version `BC.A1.003.009`. Kernel module `akida_pcie` already loaded on the host. Device node `/dev/akd1500_0` (mode 666). |
+| Host SDK | The host has its own `venv_akida` with `akida 2.8.0`. It is not used by the container (2.19.3). |
+| Registry | `bender:5000` resolves to `172.17.0.39` on the Pi's network, so **`bender:5000` and `172.17.0.39:5000` are the same registry** (answers the open question in section 8). |
+| Image | `bender:5000/akida-devhub:ubuntu24.04-cpu-aarch64`, ID `15c17289d5f5`, digest `sha256:c533329f1a9a2d0f2f0de2dba8497ca89797ee6f0a422325d72544cf859ae9d1`, 4.1 GB, pulled in 267 s |
+
+**Inside the image** (same checks as for the x86 images): Ubuntu 24.04.5, Python 3.12.3, aarch64, user `akida` UID/GID 1000. DevHub at commit `8be7c232`, clean tree, `akida1` (`README.md`, `docs`, `model_zoo`) and `akida2` (`model_zoo`). Packages identical to the x86 image: akida 2.19.3, cnn2snn 2.19.3, quantizeml 1.2.5, akida_models 1.14.2, metatf 2.19.3, TensorFlow 2.19.1, Keras 3.15.1, jupyterlab 4.6.4. `pip check` shows the same `akida_models` 1.14.0 against 1.14.2 conflict (DOC-19). Startup prints `TensorFlow 2.19.1 - GPUs visible: 0` and `akida 2.19.3 - Akida devices found: 1`. Every notebook start also prints an onnxruntime `GPU device discovery failed ... /sys/class/drm/card1/device/vendor` warning (more noise, DOC-17).
+
+**Device passthrough**
+
+| Run | Flags | Board visible? |
+|-----|-------|----------------|
+| A, as in the guide | `--privileged -v /dev:/dev` (no `--gpus`, no `-t`, my own container name) | **Yes.** `akida devices` and `akida.devices()` show `PCIe/AKD1500/16MB/0`. |
+| B, narrowest | `--device /dev/akd1500_0` only, not privileged | **Yes**, identical output. |
+
+So the broad flags are **not needed** on this host (DOC-5 resolved, DOC-22 below).
+
+**Notebook runs** (container `akida-rpi-nb`, `--device /dev/akd1500_0`, not privileged, headless `nbconvert --execute`, timeout disabled, one notebook at a time, evidence kept). The benchmark notebooks map the model onto the board (`akida_model.map(device, mode=AllNps, hw_only=True)`), so **the accuracy and timing numbers below are from the AKD1500**, not the software device.
+
+| Notebook | Result | Time | Notes |
+|----------|--------|------|-------|
+| `imagenet_akidanet_notebook_benchmark` | Pass | 454 s | "Target Akida device found". Mean inference 142.9 ms (system clock), 133.5 ms on chip (53.4 M clocks), 117 NPs. A third mapping (HwPr, 132 NPs) gives 110.5 ms. |
+| `imagenet_akidanet_notebook_evaluation` | Pass | 107 s | 100% on the 10-image smoke test (DOC-21). No hardware cells in this notebook. |
+| `speech_commands_notebook_benchmark` | Pass | 1374 s | Data cell took 1281 s (dataset download and preparation). **Akida accuracy (val) 0.9024**, see NB-4. Mean inference 0.372 ms (system), 0.337 ms on chip in the first run, 0.153 and 0.114 ms in the second mapping. |
+| `vww_notebook_benchmark` | **FAIL** | 13 s | `FileNotFoundError: './data/vw_coco2014_96'`. Same as NB-1, so NB-1 reproduces on aarch64. |
+| `plant_village_notebook_benchmark` | Pass | 724 s | Akida accuracy 0.9943 (same as the software device on x86). Dataset cell 115 s. The `batch_size=1` evaluation loop (NB-3) took 272 s, here **on the board**. Mean inference 97.6 ms (system), 91.5 ms on chip, 49.6 and 47.1 ms in the second mapping. |
+| `arrhythmia_notebook_benchmark` | Pass | 424 s | Akida accuracy 0.9577, macro F1 0.8355 (same as x86). Data cell 258 s here, against 2085 s on the A30 host, so NB-2 depends on the network and not on the image. Mean inference 2.49 ms (system), 2.44 ms on chip, then 0.668 and 0.625 ms. |
+
+5 of 6 pass, with **no error outputs in any of the five** (checked by counting error outputs in the executed notebooks). The first benchmark run printed `MapMode=Minimal` (read for `speech_commands`, assumed the same for the others). The label of the second run was not checked in each notebook, so those numbers are listed as "second mapping" only.
+
+**Power:** every benchmark prints "I2C INA sensor not found, running timing-only benchmark". That is expected on a Pi without the sensor, so **power measurement was not tested.**
+
+**Disk:** free space fell from 22 GB (start) to 18 GB (after the pull) to 4.3 GB (after the six notebooks). `speech_commands` alone took about 11 GB. `/workspace` in the container was 14 GB. A 29 GB card was enough here, but a 16 GB or 32 GB card with other data on it would not be (DOC-22).
+
+**Not measured on hardware:** `batch_size=32` for the `plant_village` loop (NB-3 was only timed with `batch_size=1` on the board), accuracy of `imagenet` on the full validation set, and anything over several hours.
+
+### Host quirk: the test Pi kills containers on SSH login (not an image defect)
+
+Four of the containers I started were killed, each within seconds of a new SSH login of mine, with exit code 137. The cause is a PAM hook on the host, `/etc/brainchip/ssh_notification.sh`, run on every SSH login. It stops the `lighttpd` and `jupyter-notebook` demo services and runs `docker kill` on all running containers, so that the demos do not conflict with other users of the board. On logout it restarts the services if nobody else is logged in. So: **only one SSH session at a time, and any new login (including from a colleague) ends a running test.** I worked around it by running everything inside one SSH session. This is a property of the demo machine and not of the images, but it is worth documenting for anyone testing on it. Separately: the machine already has an older `akida_demo` image and a stopped `detection_demo` container, which I did not touch.
+
 ## 5. Observations before testing
 
 These come from reading the Jira ticket, not from running the images.
@@ -156,6 +206,7 @@ Findings from the notebook runs (NB-n) are below. Findings about documents and t
 |----|----------------|------|---------|
 | NB-1 | **Major** | Examples | `vww_notebook_benchmark` fails out of the box. The dataset is not in the image and is not downloaded by the notebook, and the README's download URL returned 403 from this host. |
 | NB-2 | Minor | Examples | The first run of `arrhythmia_notebook_benchmark` takes 35 minutes in one silent cell. **Cause confirmed:** the PhysioNet download (36 min for 94 MB at about 43 KB/s from this host). The preprocessing takes 41 s, as the docstring says. |
+| NB-4 | Minor (owners to assess) | Examples, hardware | `speech_commands_notebook_benchmark` reports **0.9024** Akida accuracy on the AKD1500 (Raspberry Pi 5) against **0.9306** on the software device (x86, same notebook and pretrained model). `plant_village` (0.9943) and `arrhythmia` (0.9577) match exactly. Cause not established. |
 | NB-3 | Minor | Examples | The Akida evaluation loop in `plant_village_notebook_benchmark` takes 355 s on the software device because it calls `predict(batch, batch_size=1)`. The training notebook uses `batch_size=BATCH_SIZE` (32) and took about 16 s. **Cause confirmed.** |
 
 ### NB-1: `vww_notebook_benchmark` fails because the dataset is missing (Major)
@@ -218,6 +269,20 @@ Suggested fix: (optional)
 Where to file: AK-7557 | AK-7601 (notebook issues)
 ```
 
+### NB-4: `speech_commands` accuracy differs between the board and the software device (Minor, for the owners to assess)
+
+```
+Area:          Examples (akida1/model_zoo/speech_commands), hardware
+Observed:      Cell 11 of speech_commands_notebook_benchmark prints "Akida accuracy (val)".
+               Raspberry Pi 5, AKD1500, image ubuntu24.04-cpu-aarch64 (model mapped to the board in cell 9, hw_only=True): 0.9024
+               A30 host, no board, ubuntu24.04-gpu-x86 (software device, cell 9 printed "No connected Akida hardware device detected"): 0.9306
+               Difference: 2.8 points. The same cell on plant_village (0.9943) and arrhythmia (0.9577) gives identical numbers on board and software.
+Not known:     Whether this is a real hardware against software difference for this model, or a difference in the validation data. Not checked: the number of validation samples on each side, and the software and hardware accuracy in the same session on the same data.
+Suggested check: in one session on the Pi, evaluate the same val_ds with the model unmapped (software) and mapped (hardware), and compare predictions sample by sample.
+```
+
+Why it matters: the benchmark notebooks are presented as showing that the hardware matches the software model. If this is a real divergence for the AKD1500, it should be known. If it is a data difference, the notebook output cannot be compared across machines. The image is probably not the cause, because the package versions are identical.
+
 ### Known issues, not counted as findings
 
 - The eDMA driver is built from a private branch, and AK-7565 is still open.
@@ -242,7 +307,7 @@ Where to file: AK-7557 | AK-7601 (notebook issues)
 | DOC-2 | Minor | read | Step 2 says the images are "published on the docker hub", but the beta images are on the internal registry. Wording is garbled ("pick in from the list... step 1"). |
 | DOC-3 | Major | read | Everything assumes an Akida board. The title says "on a real Akida hardware", step 3 treats the driver install as mandatory, and step 6 expects a device. The GPU image exists for training, which needs no board. There is no path for users with no device, such as a virtual-device run. **Verify:** do the notebooks run with no board, and does the startup `akida devices` check fail loudly or block? **Partial result:** with no board and no `--privileged`, the container starts in about 7 s and the startup check prints `akida 2.19.3 - Akida devices found: 0` without failing. So a no-device GPU run works, but the guide never says so. **Confirmed for notebooks:** the five Akida 1 benchmark and evaluation notebooks that run (see section 4b) skip their hardware cells cleanly with no board (for example "No hardware found - the benchmark sections below will be skipped."). So the notebooks are designed for it, and the guide should say so. |
 | DOC-4 | Major | read | No host prerequisites are listed for GPU use: NVIDIA driver minimum, NVIDIA container toolkit, Docker version. Step 4 only says `--gpus all`. No search hit for "nvidia" other than that flag. |
-| DOC-5 | Minor | read | The `--privileged -v /dev:/dev` run command is presented as required, with no note that it is only needed for Akida device access, or about the security implications. **Partial result:** a GPU-only run without `--privileged` or `/dev` works (TensorFlow sees both A30s). So these flags are only needed for the Akida board. Narrower `--device` flags can't be tested without a board. |
+| DOC-5 | Minor | read | The `--privileged -v /dev:/dev` run command is presented as required, with no note that it is only needed for Akida device access, or about the security implications. **Partial result:** a GPU-only run without `--privileged` or `/dev` works (TensorFlow sees both A30s). So these flags are only needed for the Akida board. **Confirmed on the Raspberry Pi 5 (4d):** `--device /dev/akd1500_0` alone, with no `--privileged` and no `/dev` mount, gives the same board visibility as the guide's flags. The guide should show the narrower form and say which node name to use (`/dev/akd1500_0` here). |
 | DOC-6 | Minor | read | The expected device output is `PCIe/NSoC_v2/0`, but the beta scope is AKD1500 and Tejaswini's Jira output was `PCIe/AKD1500/16MB/0`. **Verify** what actually appears. |
 | DOC-7 | Minor | read | Step 7 starts Jupyter in the container shell, then lists `docker logs akida-dev` without saying it runs on the host, in a second terminal. It does not explain how to reach the notebook from a remote machine, such as an SSH tunnel for port 8888 and the token URL. The build README says the default `CMD` is JupyterLab, which the USER_GUIDE never mentions. Running without `bash` would start Jupyter directly and make `docker logs` the natural way to get the token. **Confirmed by run:** the default CMD starts JupyterLab and the token URL appears in `docker logs`. Without the token, the API returns 403. So the flow works, but the guide never describes the default-CMD route. |
 | DOC-8 | Minor | read | Step 4 says there is no bind mount, so work in `/workspace` lives only in the named container. The troubleshooting step suggests `docker rm akida-dev`, which deletes it. The guide does not warn about losing notebook edits or outputs, or say how to copy them out (`docker cp`). **Observed:** the `plant_village` run downloaded an 868 MB dataset archive and extracted it into the container, making the container's writable layer 2.6 GB. Removing the container deletes the trained models and dataset, which would have to be downloaded again. |
@@ -258,6 +323,7 @@ Where to file: AK-7557 | AK-7601 (notebook issues)
 | DOC-19 | Minor now, Major if notebooks fail | **confirmed by run** | `pip check` inside the image reports `brainchip-utils 0.1.0 has requirement akida_models==1.14.0, but you have akida-models 1.14.2`. DevHub's `pyproject.toml` pins `akida_models==1.14.0` (and `tensorflow==2.19.1`, which matches). The image gets 1.14.2 through `metatf 2.19.3`. So the DevHub notebooks run against a different `akida_models` than the one they pin. **Partial result:** the `plant_village` training notebook ran to completion with `akida_models` 1.14.2 and no error outputs, so the mismatch did not break that notebook. The notebook did log `UserWarning: Model akidanet_imagenet_224_alpha_50.h5 has been trained with akida_models 1.1.10 which is the last version supporting 1.0 models training. Continuing execution.` Other notebooks are still to be run. Suggest aligning the pin, or documenting the tested combination. |
 | DOC-20 | Minor | **confirmed by run** | The guide never says the container needs outbound internet, or what it downloads. The notebooks download datasets and weights on first run, from `data.brainchip.com` and PhysioNet (confirmed in code and by the runs) and from the TFDS source for `speech_commands`. A customer behind a firewall or offline has no warning. The Jira says notebooks are "ready to run immediately... no setup step". After four benchmark notebooks plus one training run, `akida1/model_zoo` in the containers had grown to 14 GB. The guide gives no disk or first-run time expectation (first runs observed: 5 to 35 minutes). |
 | DOC-21 | Enhancement | **confirmed by run** | The `imagenet_akidanet` notebooks report 100% top-1 and top-5 because they evaluate a 10-image sample pack unless the full ImageNet validation set is present. The notebook says so in its output, but neither the guide nor the notebook headings say how to get the full set. |
+| DOC-22 | Minor | **confirmed by run** | The guide gives no disk requirement. On the Raspberry Pi 5 (29 GB card) free space fell from 22 GB to 4.3 GB after the 4.1 GB pull and six benchmark notebooks, of which `speech_commands` alone took about 11 GB. On a smaller card or a card with other data, the run would fail with a disk error. Related to DOC-20. Suggested wording: image size plus about 15 GB for datasets. |
 | DOC-18 | Enhancement | **confirmed by run** | The image's only label is `org.opencontainers.image.version=24.04`. There is no label for the metatf version, DevHub commit or build date, so these can't be read without starting a container. |
 
 ## 7a. Documentation fixes requested
@@ -272,7 +338,8 @@ For the document owners. IDs refer to the table in section 7. Items marked **(ve
 | Step 2 | Fix the garbled sentence ("pick in from the list... step 1"). Say where the images are published: the internal registry for the beta, and Docker Hub only once it is live. | DOC-2 |
 | Step 1 | Add host prerequisites for the GPU images: minimum NVIDIA driver, NVIDIA container toolkit, and a Docker version. Say that `--gpus all` needs them. | DOC-4 |
 | Intro, steps 3 and 4 | Add a no-board path. Training and inference without a device work in the container without `--privileged` or `/dev`, and step 3 (driver install) is only for runs on real hardware. Give a command for each case. | DOC-3, DOC-5 |
-| Step 4 | State that `--privileged -v /dev:/dev` is only needed for access to the Akida board, and note what it exposes. **(verify:** narrower `--device` flags on a board host.) | DOC-5 |
+| Step 4 | State that `--privileged -v /dev:/dev` is only needed for access to the Akida board, and note what it exposes. Show `--device /dev/akd1500_0` as the narrower form (confirmed on a Raspberry Pi 5, 4d), and how to find the node name on other hosts. | DOC-5 |
+| Step 1 or 4 | Add a disk requirement (image size plus about 15 GB for datasets), and a note for Raspberry Pi SD cards. | DOC-22 |
 | Step 4 and Troubleshooting | Warn that work in `/workspace` lives only in the named container and that `docker rm akida-dev` deletes it. Show how to copy files out (`docker cp`). | DOC-8 |
 | Step 6 | Update the expected output to match the board in scope (AKD1500, e.g. `PCIe/AKD1500/16MB/0`) instead of `PCIe/NSoC_v2/0`. **(verify)** | DOC-6 |
 | Step 7 | Mention that the default `CMD` starts JupyterLab. Say that `docker logs` runs on the host in a second terminal and is where the token appears. Explain remote access (SSH tunnel for port 8888). Point to `akida1/model_zoo`, where the notebooks are. | DOC-7, DOC-13 |
@@ -327,7 +394,7 @@ In priority order. Items 1 to 4 are small changes. Item 5 is testing that needs 
 2. **Settle where the `vww` dataset comes from, and make the notebook get it** (NB-1). The README's SiLabs URL returned 403 from the test host. Please try it from another network, and ideally host the dataset on the `data.brainchip.com` mirror like the other projects.
 3. **Document the GPU and no-board paths** (DOC-3, DOC-4, DOC-5). Add host prerequisites (NVIDIA driver, container toolkit), a no-board launch command without `--privileged`, and a note that step 3 (driver install) is only for real hardware.
 4. **Correct stale references** (DOC-13, DOC-9, DOC-14, Section 5): the `akida1/notebooks/` paths, the old bind-mount command in the Jira, the five-versus-six validated combinations, and the "Ubuntu 20.04/22.04" spec text.
-5. **Validate on a board.** Someone with an AKD1500 PCIe or M.2 card should follow the guide end to end: driver installer, Secure Boot, device passthrough, `akida devices`, and hardware inference. None of this was tested.
+5. **Finish the board validation.** Done on a Raspberry Pi 5 (4d): device passthrough, `akida devices`, and hardware inference in five benchmark notebooks. Still to do: the driver installer, the Secure Boot flow, a board in an x86 host, and power measurement. Also look at NB-4 (`speech_commands` accuracy on the board against software).
 
 **Second priority**
 6. Set expectations for first runs (DOC-20, NB-2): the container needs outbound internet, downloads datasets on first use, and grows to many GB. The `arrhythmia` first run took 36 minutes, nearly all of it a silent PhysioNet download, so print progress or mirror the data.
@@ -336,13 +403,14 @@ In priority order. Items 1 to 4 are small changes. Item 5 is testing that needs 
 9. Smaller improvements: quieter startup output (DOC-17), OCI labels for versions and commit (DOC-18), tag guidance (DOC-12), UID guidance (DOC-15), notebook wording (DOC-21), and the cosmetic items (DOC-11).
 
 **Questions for the owners**
-- Is `172.17.0.39:5000` the same registry as `bender:5000`? (`bender` did not resolve from the test host.)
+- ~~Is `172.17.0.39:5000` the same registry as `bender:5000`?~~ Answered (4d): on the Raspberry Pi's network `bender` resolves to `172.17.0.39`, so yes. Please still document a way in for testers whose network does not resolve `bender`.
+- Is the `speech_commands` accuracy difference between the board (0.9024) and the software device (0.9306) expected (NB-4)?
 - Where should the `vww` dataset come from?
 - Is `batch_size=1` in the benchmark loop deliberate for hardware runs?
 - Was `ubuntu22.04-gpu-x86` validated by the build team? It worked in these tests, but the parent README lists five combinations and six are built.
 - Can the driver installer README be shared for review?
 
-**Testing still to do:** the CPU and aarch64 images, the other training notebooks (and any training notebook on the 22.04 image), a board-attached run, and longer stability runs.
+**Testing still to do:** `ubuntu22.04-cpu-aarch64` and the two CPU x86 images, the driver installer and Secure Boot flow, the other training notebooks (and any training notebook on the 22.04 image), power measurement, the NB-4 check, and longer stability runs.
 
 ## 9. Test log
 
@@ -380,3 +448,12 @@ _Commands run and their results will be appended here in order._
 | 2026-10-15 | Notebook's own steps on 22.04 (`build_plant_village_model`, `cnn2snn.quantize`, `cnn2snn.convert`, `predict`, pretrained `.h5` and `.fbz` load) | Pass. 16-layer Akida model, `IpVersion.v1`, output shape `(8, 1, 1, 38)`. |
 | 2026-10-15 | Three notebooks on 22.04 in container `akida-2204` (`run_2204_nb.sh`) | 3 of 3 pass, 19 s, 21 s and 436 s. Same numbers as 24.04. NB-3 reproduces. |
 | 2026-10-15 | Cleanup: removed `akida-2204` | Done. No akida containers left, port 8888 free. Images kept: both akida-devhub GPU images and the small CUDA image. |
+| 2026-10-29 | Created branch `test/rpi5-aarch64-images`. SSH to the lab Raspberry Pi 5. Read-only recon: model, OS, memory, disk, Docker, `akida devices` in the host `venv_akida` | Pi 5, Ubuntu 24.04, 29 GB card, board `PCIe/AKD1500/16MB/0`. `docker` denied: the account was not in the `docker` group. |
+| 2026-10-29 | After the host owner added the account to the `docker` group (no `sudo` used): recheck, registry name resolution and reachability | Docker works. `bender` resolves to `172.17.0.39`, both answer 200, the aarch64 tags are listed. `/dev/akd1500_0` present. |
+| 2026-10-29 | `docker pull bender:5000/akida-devhub:ubuntu24.04-cpu-aarch64` | Pass. 267 s, ID `15c17289d5f5`, 4.1 GB. |
+| 2026-10-29 | Test A: `docker run --rm --privileged -v /dev:/dev` plus `check_pi.sh` (versions, DevHub commit, `pip check`, `akida devices`, Python `akida.devices()`) | Pass. Board visible, 32 NPs, DevHub `8be7c232`, DOC-19 conflict as on x86. |
+| 2026-10-29 | Test B: `docker run --rm --device /dev/akd1500_0` (not privileged) plus the same checks | Pass. Board visible, identical output (DOC-5 resolved, DOC-22). |
+| 2026-10-29 | Started `sleep infinity` containers and ran more commands in new SSH sessions | Four containers were killed (exit 137), each as a new SSH session of mine opened. Root cause found by reading the login hook `/etc/brainchip/ssh_notification.sh` (and the account's shell startup files, which had nothing relevant). Nothing was changed on the host. |
+| 2026-10-29 | Batch run in one SSH session (`wrapper_pi.sh`, in the scratchpad): 6 notebooks, 5400 s cap each, container `akida-rpi-nb` | 5 pass, `vww` fails (NB-1). 454, 107, 1374, 13, 724 and 424 s. Evidence bundle (executed notebooks and logs) pulled back through the same session. |
+| 2026-10-29 | Analysis of the executed notebooks | Hardware cells ran. Accuracy: `plant_village` 0.9943, `arrhythmia` 0.9577, `speech_commands` 0.9024 (x86 software: 0.9306, NB-4). No error outputs. No I2C power sensor. |
+| 2026-10-29 | Cleanup: removed `akida-rpi-nb` (end of the batch script). Kept the pulled image on the Pi. | Done. The older `akida_demo` image and `detection_demo` container were not touched. |

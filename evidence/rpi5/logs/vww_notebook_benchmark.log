@@ -1,0 +1,138 @@
+[NbConvertApp] Converting notebook brainchip_devhub/akida1/model_zoo/vww/vww_notebook_benchmark.ipynb to notebook
+[IPKernelApp] WARNING | Kernel is running over TCP without encryption. All communication (including code and outputs) is sent in plain text and is susceptible to eavesdropping. Use IPC transport or launch with kernel manager-provisioned CurveZMQ keys to enable transport encryption.
+Traceback (most recent call last):
+  File "/opt/venv/bin/jupyter-nbconvert", line 6, in <module>
+    sys.exit(main())
+             ^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/jupyter_core/application.py", line 284, in launch_instance
+    super().launch_instance(argv=argv, **kwargs)
+  File "/opt/venv/lib/python3.12/site-packages/traitlets/config/application.py", line 1080, in launch_instance
+    app.start()
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 420, in start
+    self.convert_notebooks()
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 597, in convert_notebooks
+    self.convert_single_notebook(notebook_filename)
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 563, in convert_single_notebook
+    output, resources = self.export_single_notebook(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/nbconvertapp.py", line 487, in export_single_notebook
+    output, resources = self.exporter.from_filename(
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 201, in from_filename
+    return self.from_file(f, resources=resources, **kw)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 220, in from_file
+    return self.from_notebook_node(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/exporters/notebook.py", line 36, in from_notebook_node
+    nb_copy, resources = super().from_notebook_node(nb, resources, **kw)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 154, in from_notebook_node
+    nb_copy, resources = self._preprocess(nb_copy, resources)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/exporters/exporter.py", line 353, in _preprocess
+    nbc, resc = preprocessor(nbc, resc)
+                ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/preprocessors/base.py", line 48, in __call__
+    return self.preprocess(nb, resources)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/preprocessors/execute.py", line 103, in preprocess
+    self.preprocess_cell(cell, resources, index)
+  File "/opt/venv/lib/python3.12/site-packages/nbconvert/preprocessors/execute.py", line 124, in preprocess_cell
+    cell = self.execute_cell(cell, index, store_history=True)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/jupyter_core/utils/__init__.py", line 165, in wrapped
+    return loop.run_until_complete(inner)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.12/asyncio/base_events.py", line 687, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/opt/venv/lib/python3.12/site-packages/nbclient/client.py", line 1062, in async_execute_cell
+    await self._check_raise_for_error(cell, cell_index, exec_reply)
+  File "/opt/venv/lib/python3.12/site-packages/nbclient/client.py", line 918, in _check_raise_for_error
+    raise CellExecutionError.from_cell_and_msg(cell, exec_reply_content)
+nbclient.exceptions.CellExecutionError: An error occurred while executing the following cell:
+------------------
+from vww_data import get_data
+
+BATCH_SIZE = 32
+INPUT_SHAPE = (96, 96, 3)
+
+train_ds, val_ds = get_data(DATA_PATH, INPUT_SHAPE, BATCH_SIZE, seed=SEED)
+------------------
+
+
+[31m---------------------------------------------------------------------------[39m
+[31mFileNotFoundError[39m                         Traceback (most recent call last)
+[36mCell[39m[36m [39m[32mIn[3][39m[32m, line 6[39m
+[32m      2[39m 
+[32m      3[39m BATCH_SIZE = [32m32[39m
+[32m      4[39m INPUT_SHAPE = ([32m96[39m, [32m96[39m, [32m3[39m)
+[32m      5[39m 
+[32m----> [39m[32m6[39m train_ds, val_ds = get_data(DATA_PATH, INPUT_SHAPE, BATCH_SIZE, seed=SEED)
+
+[36mFile [39m[32m/workspace/brainchip_devhub/akida1/model_zoo/vww/vww_data.py:38[39m, in [36mget_data[39m[34m(data_path, input_shape, batch_size, seed)[39m
+[32m     28[39m [38;5;66;03m# Create a data generator with data augmentation and load files from[39;00m
+[32m     29[39m [38;5;66;03m# directory[39;00m
+[32m     30[39m train_datagen = ImageDataGenerator(
+[32m     31[39m     rotation_range = [32m10[39m,
+[32m     32[39m     width_shift_range = [32m0.05[39m,
+[32m   (...)[39m[32m     35[39m     horizontal_flip = [38;5;28;01mTrue[39;00m,
+[32m     36[39m     validation_split = validation_split)
+[32m---> [39m[32m38[39m train_generator = [30;43mtrain_datagen[39;49m[30;43m.[39;49m[30;43mflow_from_directory[39;49m[30;43m([39;49m
+[32m     39[39m [30;43m    [39;49m[30;43mdata_path[39;49m[30;43m,[39;49m
+[32m     40[39m [30;43m    [39;49m[30;43mtarget_size[39;49m[30;43m=[39;49m[30;43minput_shape[39;49m[30;43m[[39;49m[30;43m:[39;49m[30;43m2[39;49m[30;43m][39;49m[30;43m,[39;49m
+[32m     41[39m [30;43m    [39;49m[30;43mbatch_size[39;49m[30;43m=[39;49m[30;43mbatch_size[39;49m[30;43m,[39;49m
+[32m     42[39m [30;43m    [39;49m[30;43msubset[39;49m[30;43m [39;49m[30;43m=[39;49m[30;43m [39;49m[30;43m'[39;49m[30;43mtraining[39;49m[30;43m'[39;49m[30;43m,[39;49m
+[32m     43[39m [30;43m    [39;49m[30;43mcolor_mode[39;49m[30;43m=[39;49m[30;43m'[39;49m[30;43mrgb[39;49m[30;43m'[39;49m[30;43m,[39;49m
+[32m     44[39m [30;43m    [39;49m[30;43mclass_mode[39;49m[30;43m [39;49m[30;43m=[39;49m[30;43m [39;49m[30;43m'[39;49m[30;43msparse[39;49m[30;43m'[39;49m[30;43m,[39;49m
+[32m     45[39m [30;43m    [39;49m[30;43mshuffle[39;49m[30;43m=[39;49m[30;43;01mTrue[39;49;00m[30;43m)[39;49m
+[32m     47[39m val_datagen = ImageDataGenerator(
+[32m     48[39m     validation_split = validation_split)
+[32m     50[39m val_generator = val_datagen.flow_from_directory(
+[32m     51[39m     data_path,
+[32m     52[39m     target_size=input_shape[:[32m2[39m],
+[32m   (...)[39m[32m     56[39m     class_mode = [33m'[39m[33msparse[39m[33m'[39m,
+[32m     57[39m     shuffle=[38;5;28;01mFalse[39;00m)
+
+[36mFile [39m[32m/opt/venv/lib/python3.12/site-packages/tf_keras/src/preprocessing/image.py:1649[39m, in [36mImageDataGenerator.flow_from_directory[39m[34m(self, directory, target_size, color_mode, classes, class_mode, batch_size, shuffle, seed, save_to_dir, save_prefix, save_format, follow_links, subset, interpolation, keep_aspect_ratio)[39m
+[32m   1562[39m [38;5;28;01mdef[39;00m[38;5;250m [39m[34mflow_from_directory[39m(
+[32m   1563[39m     [38;5;28mself[39m,
+[32m   1564[39m     directory,
+[32m   (...)[39m[32m   1578[39m     keep_aspect_ratio=[38;5;28;01mFalse[39;00m,
+[32m   1579[39m ):
+[32m   1580[39m [38;5;250m    [39m[33;03m"""Takes the path to a directory & generates batches of augmented data.[39;00m
+[32m   1581[39m 
+[32m   1582[39m [33;03m    Args:[39;00m
+[32m   (...)[39m[32m   1647[39m [33;03m        and `y` is a numpy array of corresponding labels.[39;00m
+[32m   1648[39m [33;03m    """[39;00m
+[32m-> [39m[32m1649[39m     [38;5;28;01mreturn[39;00m [30;43mDirectoryIterator[39;49m[30;43m([39;49m
+[32m   1650[39m [30;43m        [39;49m[30;43mdirectory[39;49m[30;43m,[39;49m
+[32m   1651[39m [30;43m        [39;49m[30;43mself[39;49m[30;43m,[39;49m
+[32m   1652[39m [30;43m        [39;49m[30;43mtarget_size[39;49m[30;43m=[39;49m[30;43mtarget_size[39;49m[30;43m,[39;49m
+[32m   1653[39m [30;43m        [39;49m[30;43mcolor_mode[39;49m[30;43m=[39;49m[30;43mcolor_mode[39;49m[30;43m,[39;49m
+[32m   1654[39m [30;43m        [39;49m[30;43mkeep_aspect_ratio[39;49m[30;43m=[39;49m[30;43mkeep_aspect_ratio[39;49m[30;43m,[39;49m
+[32m   1655[39m [30;43m        [39;49m[30;43mclasses[39;49m[30;43m=[39;49m[30;43mclasses[39;49m[30;43m,[39;49m
+[32m   1656[39m [30;43m        [39;49m[30;43mclass_mode[39;49m[30;43m=[39;49m[30;43mclass_mode[39;49m[30;43m,[39;49m
+[32m   1657[39m [30;43m        [39;49m[30;43mdata_format[39;49m[30;43m=[39;49m[30;43mself[39;49m[30;43m.[39;49m[30;43mdata_format[39;49m[30;43m,[39;49m
+[32m   1658[39m [30;43m        [39;49m[30;43mbatch_size[39;49m[30;43m=[39;49m[30;43mbatch_size[39;49m[30;43m,[39;49m
+[32m   1659[39m [30;43m        [39;49m[30;43mshuffle[39;49m[30;43m=[39;49m[30;43mshuffle[39;49m[30;43m,[39;49m
+[32m   1660[39m [30;43m        [39;49m[30;43mseed[39;49m[30;43m=[39;49m[30;43mseed[39;49m[30;43m,[39;49m
+[32m   1661[39m [30;43m        [39;49m[30;43msave_to_dir[39;49m[30;43m=[39;49m[30;43msave_to_dir[39;49m[30;43m,[39;49m
+[32m   1662[39m [30;43m        [39;49m[30;43msave_prefix[39;49m[30;43m=[39;49m[30;43msave_prefix[39;49m[30;43m,[39;49m
+[32m   1663[39m [30;43m        [39;49m[30;43msave_format[39;49m[30;43m=[39;49m[30;43msave_format[39;49m[30;43m,[39;49m
+[32m   1664[39m [30;43m        [39;49m[30;43mfollow_links[39;49m[30;43m=[39;49m[30;43mfollow_links[39;49m[30;43m,[39;49m
+[32m   1665[39m [30;43m        [39;49m[30;43msubset[39;49m[30;43m=[39;49m[30;43msubset[39;49m[30;43m,[39;49m
+[32m   1666[39m [30;43m        [39;49m[30;43minterpolation[39;49m[30;43m=[39;49m[30;43minterpolation[39;49m[30;43m,[39;49m
+[32m   1667[39m [30;43m        [39;49m[30;43mdtype[39;49m[30;43m=[39;49m[30;43mself[39;49m[30;43m.[39;49m[30;43mdtype[39;49m[30;43m,[39;49m
+[32m   1668[39m [30;43m    [39;49m[30;43m)[39;49m
+
+[36mFile [39m[32m/opt/venv/lib/python3.12/site-packages/tf_keras/src/preprocessing/image.py:563[39m, in [36mDirectoryIterator.__init__[39m[34m(self, directory, image_data_generator, target_size, color_mode, classes, class_mode, batch_size, shuffle, seed, data_format, save_to_dir, save_prefix, save_format, follow_links, subset, interpolation, keep_aspect_ratio, dtype)[39m
+[32m    561[39m [38;5;28;01mif[39;00m [38;5;129;01mnot[39;00m classes:
+[32m    562[39m     classes = []
+[32m--> [39m[32m563[39m     [38;5;28;01mfor[39;00m subdir [38;5;129;01min[39;00m [38;5;28msorted[39m([30;43mos[39;49m[30;43m.[39;49m[30;43mlistdir[39;49m[30;43m([39;49m[30;43mdirectory[39;49m[30;43m)[39;49m):
+[32m    564[39m         [38;5;28;01mif[39;00m os.path.isdir(os.path.join(directory, subdir)):
+[32m    565[39m             classes.append(subdir)
+
+[31mFileNotFoundError[39m: [Errno 2] No such file or directory: './data/vw_coco2014_96'
+

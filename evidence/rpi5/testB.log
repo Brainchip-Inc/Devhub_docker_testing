@@ -1,0 +1,10 @@
+##### TEST B: not privileged, only --device /dev/akd1500_0 #####
+=== device nodes visible ===
+crw-rw-rw- 1 root root 10, 123 Oct 29 21:02 akd1500_0
+=== akida devices ===
+Available devices:
+PCIe/AKD1500/16MB/0
+=== python view ===
+akida 2.19.3 | devices: ['PCIe/AKD1500/16MB/0']
+  ip_version: BC.A1.003.009 | mesh/NPs: 32
+exit=0
