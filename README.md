@@ -6,6 +6,22 @@ Internal beta test of the official Akida Docker images with DevHub pre-installed
 **Status: interim.** Two GPU images have been tested on a host with no Akida board.
 The CPU and aarch64 images and everything that needs a board are not yet tested.
 
+## Image status
+
+The six images in scope are the floating tags of `akida-devhub`. The versioned `2.19.3-` tags are
+internal CI images and are not tested here.
+
+| Image | Tested? | Where the results are |
+|-------|---------|-----------------------|
+| `ubuntu24.04-gpu-x86` | Yes, in depth (no board) | `main`: [report.md](report.md) |
+| `ubuntu22.04-gpu-x86` | Yes, partly (no board) | `main`: [report.md](report.md), section 4c |
+| `ubuntu24.04-cpu-aarch64` | Yes, on a Raspberry Pi 5 with an AKD1500 board | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged |
+| `ubuntu24.04-cpu-x86` | No | Not started |
+| `ubuntu22.04-cpu-x86` | No | Not started |
+| `ubuntu22.04-cpu-aarch64` | No | Not started |
+
+The PCIe driver installer images (`akida-pcie-driver-installer`) are not tested either.
+
 ## What is here
 
 | File | What it is |
