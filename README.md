@@ -10,19 +10,23 @@ report. Not yet tested: `ubuntu22.04-cpu-aarch64` and the PCIe driver installer.
 
 ## Image status
 
-Results come from two machines: a GPU host (2x NVIDIA A30, no board, used for the GPU images and training) and `orion` (x86, no GPU, with an AKD1500 board, used for the x86 CPU images). The six images in scope are the floating tags of `akida-devhub`. The versioned `2.19.3-` tags are
-internal CI images and are not tested here.
+Results come from three machines: a GPU host (2x NVIDIA A30, no board, used for the GPU images and
+training), `orion` (x86, no GPU, with an AKD1500 board, used for the x86 CPU images) and a Raspberry Pi 5
+with an AKD1500 board. The six images in scope are the floating tags of `akida-devhub`. The versioned
+`2.19.3-` tags are internal CI images and are not tested here.
 
-| Image | Tested? | Where the results are |
-|-------|---------|-----------------------|
-| `ubuntu24.04-gpu-x86` | Yes, in depth, including one training notebook (no board). Tested on the build of 2026-10-14. The tag has been rebuilt since. | `main`: [report.md](report.md) |
-| `ubuntu22.04-gpu-x86` | Yes, partly (no board). Tested on the build of 2026-10-14. The tag has been rebuilt since. | `main`: [report.md](report.md), section 4c |
-| `ubuntu24.04-cpu-aarch64` | Yes, on a Raspberry Pi 5 with an AKD1500 board | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged |
-| `ubuntu24.04-cpu-x86` | Yes, on an x86 host with an AKD1500 board (5 of 6 notebooks pass). Build of 2026-11-02. | `main`: [report.md](report.md) section 4e, [orion_x86_board_test_report.md](orion_x86_board_test_report.md) |
-| `ubuntu22.04-cpu-x86` | Yes, partly, with the board (3 notebooks run, all pass). Build of 2026-11-02. | `main`: [report.md](report.md) section 4e, [orion_x86_board_test_report.md](orion_x86_board_test_report.md) |
-| `ubuntu22.04-cpu-aarch64` | No | Not started |
+| Image | Tested? | Machine | Board? | Result | Where |
+|-------|---------|---------|--------|--------|-------|
+| `ubuntu24.04-gpu-x86` | Yes, in depth (build of 2026-10-14) | GPU host (2x A30) | No | Works with workarounds. One training notebook and 5 of 6 notebooks pass. `vww` fails (NB-1). | `main`: [report.md](report.md) |
+| `ubuntu22.04-gpu-x86` | Yes, partly (build of 2026-10-14) | GPU host | No | 3 notebooks and the quantize and convert steps pass, matching 24.04. No training notebook was run. | `main`: [report.md](report.md), section 4c |
+| `ubuntu24.04-cpu-x86` | Yes (build of 2026-11-02) | `orion` | Yes, AKD1500 | 5 of 6 notebooks pass on the board. `vww` fails (NB-1). Needs `--group-add 0` (DOC-23). | `main`: [report.md](report.md) section 4e, [orion_x86_board_test_report.md](orion_x86_board_test_report.md) |
+| `ubuntu22.04-cpu-x86` | Yes, partly (build of 2026-11-02) | `orion` | Yes, AKD1500 | 3 notebooks run, all pass. The other 3 were not run. Needs `--group-add 0` (DOC-23). | `main`: same as above |
+| `ubuntu24.04-cpu-aarch64` | Yes (older build, pulled 2026-10-29) | Raspberry Pi 5 | Yes, AKD1500 | 5 of 6 notebooks pass. `vww` fails. `speech_commands` accuracy differs (NB-4). | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged |
+| `ubuntu22.04-cpu-aarch64` | **No** | | | | |
+| `akida-pcie-driver-installer` (24.04 and 22.04) | **No** | | | | Needs a fresh machine with a board, and its README |
 
-The PCIe driver installer images (`akida-pcie-driver-installer`) are not tested either.
+Five of the six images have been run. The GPU images and the Pi image have been rebuilt since they were
+tested, so those results describe the older builds.
 
 ## What is here
 
