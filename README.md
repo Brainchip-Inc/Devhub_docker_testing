@@ -3,8 +3,10 @@
 Internal beta test of the official Akida Docker images with DevHub pre-installed
 (REQ-TOOL-005, Jira [AK-7557](https://brainchip.atlassian.net/browse/AK-7557)).
 
-**Status: interim.** Two GPU images have been tested on a host with no Akida board.
-The CPU and aarch64 images and everything that needs a board are not yet tested.
+**Status: interim.** Two GPU images were tested on a host with no Akida board, and the two x86 CPU
+images were tested with an AKD1500 board. The Raspberry Pi image is on a separate branch (see the
+table below). The floating tags have been rebuilt since the first tests, so check the digests in each
+report. Not yet tested: `ubuntu22.04-cpu-aarch64` and the PCIe driver installer.
 
 ## Image status
 
@@ -16,8 +18,8 @@ internal CI images and are not tested here.
 | `ubuntu24.04-gpu-x86` | Yes, in depth (no board) | `main`: [report.md](report.md) |
 | `ubuntu22.04-gpu-x86` | Yes, partly (no board) | `main`: [report.md](report.md), section 4c |
 | `ubuntu24.04-cpu-aarch64` | Yes, on a Raspberry Pi 5 with an AKD1500 board | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged |
-| `ubuntu24.04-cpu-x86` | No | Not started |
-| `ubuntu22.04-cpu-x86` | No | Not started |
+| `ubuntu24.04-cpu-x86` | Yes, on an x86 host with an AKD1500 board (5 of 6 notebooks pass) | `main`: [orion_x86_board_test_report.md](orion_x86_board_test_report.md) |
+| `ubuntu22.04-cpu-x86` | Yes, partly, with the board (3 notebooks run, all pass) | `main`: [orion_x86_board_test_report.md](orion_x86_board_test_report.md) |
 | `ubuntu22.04-cpu-aarch64` | No | Not started |
 
 The PCIe driver installer images (`akida-pcie-driver-installer`) are not tested either.
@@ -27,6 +29,7 @@ The PCIe driver installer images (`akida-pcie-driver-installer`) are not tested 
 | File | What it is |
 |------|------------|
 | [report.md](report.md) | The test report: summary, acceptance criteria, notebook results, 24 findings, documentation fixes, recommendations and the full test log. **Start here.** |
+| [orion_x86_board_test_report.md](orion_x86_board_test_report.md) | The two x86 CPU images run with an AKD1500 board: notebook results and two new findings (DOC-23: the container user cannot open the board by default, DOC-24: entrypoint banner). Evidence in [evidence/orion/](evidence/orion/). |
 | [plan.md](plan.md) | The test plan: objectives, phases, and facts taken from AK-7557. |
 | [jira_comment_draft.md](jira_comment_draft.md) | Draft feedback comment for AK-7557. It is a draft and has not been posted. |
 
@@ -44,8 +47,11 @@ with 2x NVIDIA A30 and no Akida board.
 - **Major issues (5, proposed):** the guide's step 2 and step 4 use different image names so `docker run`
   fails (DOC-1); `vww_notebook_benchmark` fails because its dataset is missing (NB-1); no no-board
   or GPU path in the guide (DOC-3, DOC-4); wrong notebook folder in the build README (DOC-13).
-- **Not tested:** anything that needs an Akida board, the CPU and aarch64 images, and the other
-  training notebooks. Those are reported as **not tested**, not as passed.
+- **With a board (x86 CPU images):** both find the board and run the notebooks on it, but only as
+  root or with an extra `--group-add 0`. With the guide's flags the container user sees no board and
+  nothing says why (DOC-23, proposed Major).
+- **Not tested:** `ubuntu22.04-cpu-aarch64`, the PCIe driver installer, the GPU images with a board,
+  and the other training notebooks. Those are reported as **not tested**, not as passed.
 
 See [report.md](report.md) for evidence, severities and suggested fixes.
 

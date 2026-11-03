@@ -1,0 +1,13 @@
+Status: Downloaded newer image for 172.17.0.39:5000/akida-devhub:ubuntu24.04-cpu-x86
+172.17.0.39:5000/akida-devhub:ubuntu24.04-cpu-x86
+PULL ubuntu24.04-cpu-x86 150s
+ID=sha256:a7da347b82516344d9dc7c479ee96c050f689895164e00330e9c36b6fe2870ac size=4745453169 created=2026-11-02T06:50:58.380309559Z digest=172.17.0.39:5000/akida-devhub@sha256:6f3c566e8ba5c024a0d245c71ebbbb1089fbaa5006e4905aeb1e701445cbaa73
+Loaded image: 172.17.0.39:5000/akida-devhub:ubuntu24.04-cpu-x86
+TRANSFER ubuntu24.04-cpu-x86 160s
+Status: Downloaded newer image for 172.17.0.39:5000/akida-devhub:ubuntu22.04-cpu-x86
+172.17.0.39:5000/akida-devhub:ubuntu22.04-cpu-x86
+PULL ubuntu22.04-cpu-x86 147s
+ID=sha256:bf49ed7c34432616e06a5534a055e21030dbabd64ae08ae32a34284ac622860b size=4558234385 created=2026-11-02T07:01:26.276090456Z digest=172.17.0.39:5000/akida-devhub@sha256:aa46d20d34e19c235b2481925c098436a12d237d290db0deb68d6d4ffa4d0acc
+Loaded image: 172.17.0.39:5000/akida-devhub:ubuntu22.04-cpu-x86
+TRANSFER ubuntu22.04-cpu-x86 152s
+ALLDONE

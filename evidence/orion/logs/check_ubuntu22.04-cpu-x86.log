@@ -1,0 +1,27 @@
+=== OS / user ===
+Ubuntu 22.04.5 LTS | akida uid=1000 gid=1000 groups=1000 0 | arch x86_64 | python 3.10.12
+=== devhub ===
+8be7c2327976a27a5d808ea870b2e1e2b554a24d
+status: []
+akida1: README.md docs model_zoo update_readme.py | akida2: model_zoo 
+=== key packages ===
+akida 2.19.3
+akida_models 1.14.2
+cnn2snn 2.19.3
+jupyterlab 4.6.5
+keras 3.12.4
+metatf 2.19.3
+quantizeml 1.2.5
+tensorflow 2.19.1
+=== pip check ===
+brainchip-utils 0.1.0 has requirement akida_models==1.14.0, but you have akida-models 1.14.2.
+=== device node visible ===
+crw-rw---- 1 root root 10, 261 Nov  3 22:59 akd1500_0
+=== akida devices ===
+Available devices:
+PCIe/AKD1500/16MB/0
+=== python view ===
+akida 2.19.3 | devices: ['PCIe/AKD1500/16MB/0']
+  ip_version: BC.A1.003.009 | NPs: 32
+=== jupyter token check (inside container) ===
+no token: 403

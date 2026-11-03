@@ -1,0 +1,90 @@
+  akd1500     held by akayyam       since 2026-11-03 14:29 PST  expires 2026-11-03 17:29 PST (2h57m left)  note: Akida Docker image beta test AK-7557 (Ali Kayyam)
+[ubuntu24.04-cpu-x86] image: size=4822225812 created=2026-11-02T06:50:58.380309559Z cmd=[jupyter lab --ip=0.0.0.0 --port=8888 --no-browser] entrypoint=[entrypoint.sh] user=akida labels=map[com.brainchip.devhub-commit:8be7c2327976a27a5d808ea870b2e1e2b554a24d com.brainchip.metatf-version:2.19.3 org.opencontainers.image.created:2026-11-02T06:45:58Z org.opencontainers.image.version:2.19.3]
+[ubuntu24.04-cpu-x86] container: running started 2026-11-03T22:32:12Z
+TensorFlow 2.19.1 - GPUs visible: 0
+akida 2.19.3 - Akida devices found: 1
+[I 2026-11-03 22:31:51.391 ServerApp] http://0.0.0.0:8888/lab?token=<redacted>
+[I 2026-11-03 22:31:51.391 ServerApp]     http://127.0.0.1:8888/lab?token=<redacted>
+=== OS / user ===
+Ubuntu 24.04.5 LTS | akida uid=1000 gid=1000 groups=1000 0 | arch x86_64 | python 3.12.3
+=== devhub ===
+8be7c2327976a27a5d808ea870b2e1e2b554a24d
+status: []
+akida1: README.md docs model_zoo update_readme.py | akida2: model_zoo 
+=== key packages ===
+akida 2.19.3
+akida_models 1.14.2
+cnn2snn 2.19.3
+jupyterlab 4.6.5
+keras 3.15.1
+metatf 2.19.3
+quantizeml 1.2.5
+tensorflow 2.19.1
+=== pip check ===
+brainchip-utils 0.1.0 has requirement akida_models==1.14.0, but you have akida-models 1.14.2.
+=== device node visible ===
+crw-rw---- 1 root root 10, 261 Nov  3 22:31 akd1500_0
+=== akida devices ===
+Available devices:
+PCIe/AKD1500/16MB/0
+=== python view ===
+akida 2.19.3 | devices: ['PCIe/AKD1500/16MB/0']
+  ip_version: BC.A1.003.009 | NPs: 32
+=== jupyter token check (inside container) ===
+no token: 403
+[ubuntu24.04-cpu-x86] START imagenet_akidanet_notebook_benchmark 22:32:13
+[ubuntu24.04-cpu-x86] DONE  imagenet_akidanet_notebook_benchmark exit=0 397s disk_free=667G
+[ubuntu24.04-cpu-x86] START imagenet_akidanet_notebook_evaluation 22:38:50
+[ubuntu24.04-cpu-x86] DONE  imagenet_akidanet_notebook_evaluation exit=0 31s disk_free=667G
+[ubuntu24.04-cpu-x86] START speech_commands_notebook_benchmark 22:39:21
+[ubuntu24.04-cpu-x86] DONE  speech_commands_notebook_benchmark exit=0 356s disk_free=656G
+[ubuntu24.04-cpu-x86] START vww_notebook_benchmark 22:45:17
+[ubuntu24.04-cpu-x86] DONE  vww_notebook_benchmark exit=1 5s disk_free=656G
+[ubuntu24.04-cpu-x86] START plant_village_notebook_benchmark 22:45:22
+[ubuntu24.04-cpu-x86] DONE  plant_village_notebook_benchmark exit=0 605s disk_free=654G
+[ubuntu24.04-cpu-x86] START arrhythmia_notebook_benchmark 22:55:27
+[ubuntu24.04-cpu-x86] DONE  arrhythmia_notebook_benchmark exit=0 256s disk_free=654G
+[ubuntu24.04-cpu-x86] disk in container: 41M	/home/akida 14G	/workspace 
+[ubuntu24.04-cpu-x86] container removed 2026-11-03T22:59:45Z
+[ubuntu22.04-cpu-x86] image: size=4634597270 created=2026-11-02T07:01:26.276090456Z cmd=[jupyter lab --ip=0.0.0.0 --port=8888 --no-browser] entrypoint=[entrypoint.sh] user=akida labels=map[com.brainchip.devhub-commit:8be7c2327976a27a5d808ea870b2e1e2b554a24d com.brainchip.metatf-version:2.19.3 org.opencontainers.image.created:2026-11-02T06:56:49Z org.opencontainers.image.version:2.19.3]
+[ubuntu22.04-cpu-x86] container: running started 2026-11-03T23:00:10Z
+TensorFlow 2.19.1 - GPUs visible: 0
+akida 2.19.3 - Akida devices found: 1
+[I 2026-11-03 22:59:50.951 ServerApp] http://0.0.0.0:8888/lab?token=<redacted>
+[I 2026-11-03 22:59:50.951 ServerApp]     http://127.0.0.1:8888/lab?token=<redacted>
+=== OS / user ===
+Ubuntu 22.04.5 LTS | akida uid=1000 gid=1000 groups=1000 0 | arch x86_64 | python 3.10.12
+=== devhub ===
+8be7c2327976a27a5d808ea870b2e1e2b554a24d
+status: []
+akida1: README.md docs model_zoo update_readme.py | akida2: model_zoo 
+=== key packages ===
+akida 2.19.3
+akida_models 1.14.2
+cnn2snn 2.19.3
+jupyterlab 4.6.5
+keras 3.12.4
+metatf 2.19.3
+quantizeml 1.2.5
+tensorflow 2.19.1
+=== pip check ===
+brainchip-utils 0.1.0 has requirement akida_models==1.14.0, but you have akida-models 1.14.2.
+=== device node visible ===
+crw-rw---- 1 root root 10, 261 Nov  3 22:59 akd1500_0
+=== akida devices ===
+Available devices:
+PCIe/AKD1500/16MB/0
+=== python view ===
+akida 2.19.3 | devices: ['PCIe/AKD1500/16MB/0']
+  ip_version: BC.A1.003.009 | NPs: 32
+=== jupyter token check (inside container) ===
+no token: 403
+[ubuntu22.04-cpu-x86] START imagenet_akidanet_notebook_evaluation 23:00:12
+[ubuntu22.04-cpu-x86] DONE  imagenet_akidanet_notebook_evaluation exit=0 35s disk_free=667G
+[ubuntu22.04-cpu-x86] START plant_village_notebook_benchmark 23:00:47
+[ubuntu22.04-cpu-x86] DONE  plant_village_notebook_benchmark exit=0 606s disk_free=664G
+[ubuntu22.04-cpu-x86] START arrhythmia_notebook_benchmark 23:10:53
+[ubuntu22.04-cpu-x86] DONE  arrhythmia_notebook_benchmark exit=0 258s disk_free=664G
+[ubuntu22.04-cpu-x86] disk in container: 41M	/home/akida 3.2G	/workspace 
+[ubuntu22.04-cpu-x86] container removed 2026-11-03T23:15:13Z
+BATCHDONE
