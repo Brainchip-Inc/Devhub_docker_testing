@@ -72,7 +72,7 @@ Needed for the PCIe passthrough and hardware inference tests. Until one is avail
 
 ## Things to verify early
 
-- [X] Registry reachability (checked 2026-10-14): `bender` does not resolve from this host. Docker already trusts `172.17.0.39:5000` as an insecure registry. It answers, and it holds `akida-devhub` and `akida-pcie-driver-installer` with every tag listed in the Jira, plus `2.19.3-` prefixed copies of each. **Likely bender, but unconfirmed.**
+- [X] Registry reachability (checked 2026-10-14): `bender` does not resolve from this host. Docker already trusts `172.17.0.39:5000` as an insecure registry. It answers, and it holds `akida-devhub` and `akida-pcie-driver-installer` with every tag listed in the Jira, plus `2.19.3-` prefixed copies of each (those are internal CI images, out of scope). **Likely bender, but unconfirmed.**
 - [ ] Confirm that `172.17.0.39:5000` is bender (ask Tejaswini or Kevin). If it is, use it in place of `bender:5000` in all commands.
 - [ ] `git.corp.brainchipinc.com` resolves and answers (HTTPS 302 to login). Reading it needs credentials, which are present on this host, so Ali must approve their use. Otherwise Ali exports the README and USER_GUIDE.
 - [X] Akida device: none on this host (no PCI device, no kernel module). Secure Boot is already disabled here. The beta scope is AKD1500, so the hardware phases need a PCIe or M.2 card on another machine.
