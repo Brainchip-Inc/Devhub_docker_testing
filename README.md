@@ -13,6 +13,7 @@ images, the driver installer and the Secure Boot flow are not yet tested.
 |------|------------|
 | [report.md](report.md) | The test report: summary, acceptance criteria, notebook results, 26 findings, documentation fixes, recommendations and the full test log. **Start here.** |
 | [plan.md](plan.md) | The test plan: objectives, phases, and facts taken from AK-7557. |
+| [running_notebooks_and_python_in_docker.md](running_notebooks_and_python_in_docker.md) | Customer-facing how-to: start the image, run the notebooks (browser or command line) and your own Python scripts. Commands were checked on an x86 GPU host. |
 | [evidence/rpi5/](evidence/rpi5/) | Raspberry Pi 5 run: results table, notebook run logs, device checks, and the scripts used. Executed notebooks are not copied (internal content). |
 | [jira_comment_draft.md](jira_comment_draft.md) | Draft feedback comment for AK-7557. It is a draft and has not been posted. |
 
