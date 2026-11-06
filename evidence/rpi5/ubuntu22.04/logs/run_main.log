@@ -1,0 +1,71 @@
+[19:55:58] host ubuntu | 6.8.0-1007-raspi | disk_free=14G | start
+Status: Image is up to date for bender:5000/akida-devhub:ubuntu22.04-cpu-aarch64
+bender:5000/akida-devhub:ubuntu22.04-cpu-aarch64
+[19:56:08] PULL 10s | disk_free=14G
+ID=sha256:f0ef35ea12ea265198141f1d43987101307e3ba02e665bfe24f92334ef7a3520 size=3857156095 created=2026-11-02T13:21:03.833731717+05:30 arch=arm64 cmd=[jupyter lab --ip=0.0.0.0 --port=8888 --no-browser] entrypoint=[entrypoint.sh] user=akida labels=map[com.brainchip.devhub-commit:8be7c2327976a27a5d808ea870b2e1e2b554a24d com.brainchip.metatf-version:2.19.3 org.opencontainers.image.created:2026-11-02T07:22:10Z org.opencontainers.image.version:2.19.3] digest=bender:5000/akida-devhub@sha256:0e3fd291f046962ddd890bb0850e8f7b2d17a3d3af933f0a9bce3594fe8857c9
+[19:56:08] == Test A: guide flags (--privileged -v /dev:/dev), default user
+akida 2.19.3 - Akida devices found: 1
+[<akida.core.HardwareDevice object at 0xffff95bc54b0>]
+[19:56:30] == Test B: narrow --device /dev/akd1500_0, default user
+akida 2.19.3 - Akida devices found: 1
+[<akida.core.HardwareDevice object at 0xffff82f654b0>]
+[19:56:37] == Banner on stdout? (DOC-24): capture of 'id' via docker run
+TensorFlow 2.19.1 - GPUs visible: 0
+akida 2.19.3 - Akida devices found: 0
+uid=1000(akida) gid=1000(akida) groups=1000(akida)
+[19:56:45] == default CMD start + contents check
+[19:57:25] container: running
+TensorFlow 2.19.1 - GPUs visible: 0
+akida 2.19.3 - Akida devices found: 1
+[I 2026-11-05 19:56:55.944 ServerApp] http://0.0.0.0:8888/lab?token=<redacted>
+[I 2026-11-05 19:56:55.944 ServerApp]     http://127.0.0.1:8888/lab?token=<redacted>
+=== OS / user ===
+Ubuntu 22.04.5 LTS | akida uid=1000 gid=1000 groups=1000 | arch aarch64 | python 3.10.12
+=== devhub ===
+8be7c2327976a27a5d808ea870b2e1e2b554a24d
+status: []
+akida1: README.md docs model_zoo update_readme.py | akida2: model_zoo 
+=== key packages ===
+akida 2.19.3
+akida_models 1.14.2
+cnn2snn 2.19.3
+jupyterlab 4.6.5
+keras 3.12.4
+metatf 2.19.3
+quantizeml 1.2.5
+tensorflow 2.19.1
+=== pip check ===
+brainchip-utils 0.1.0 has requirement akida_models==1.14.0, but you have akida-models 1.14.2.
+=== device node visible ===
+crw-rw-rw- 1 root root 10, 123 Nov  5 19:56 akd1500_0
+=== akida devices ===
+Available devices:
+PCIe/AKD1500/16MB/0
+=== python view ===
+akida 2.19.3 | devices: ['PCIe/AKD1500/16MB/0']
+  ip_version: BC.A1.003.009 | NPs: 32
+=== jupyter token check (inside container) ===
+no token: 403
+[19:57:38] START imagenet_akidanet_notebook_evaluation | disk_free=14G
+[20:00:45] DONE  imagenet_akidanet_notebook_evaluation exit=0 187s container=[running exit=0] disk_in_container=41M
+[20:00:45] removed | disk_free=14G
+[20:00:51] START arrhythmia_notebook_benchmark | disk_free=14G
+[20:07:36] DONE  arrhythmia_notebook_benchmark exit=0 404s container=[running exit=0] disk_in_container=1.3M
+[20:07:36] removed | disk_free=14G
+[20:07:42] START plant_village_notebook_benchmark | disk_free=14G
+[20:21:56] DONE  plant_village_notebook_benchmark exit=1 854s container=[running exit=0] disk_in_container=1.3M
+[20:21:57] removed | disk_free=14G
+[20:22:02] START speech_commands_notebook_benchmark | disk_free=14G
+[20:51:15] DONE  speech_commands_notebook_benchmark exit=0 1752s container=[running exit=0] disk_in_container=1.3M
+[20:51:17] removed | disk_free=14G
+[20:51:23] START imagenet_akidanet_notebook_benchmark | disk_free=14G
+[21:00:02] DONE  imagenet_akidanet_notebook_benchmark exit=0 518s container=[running exit=0] disk_in_container=41M
+[21:00:02] removed | disk_free=14G
+[21:00:02] == results ==
+notebook	exit	seconds
+imagenet_akidanet_notebook_evaluation	0	187
+arrhythmia_notebook_benchmark	0	404
+plant_village_notebook_benchmark	1	854
+speech_commands_notebook_benchmark	0	1752
+imagenet_akidanet_notebook_benchmark	0	518
+[21:00:02] finished | disk_free=14G

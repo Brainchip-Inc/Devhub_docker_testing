@@ -2,8 +2,8 @@
 
 - **Tester:** Ali Kayyam (Douglas McLelland covering: TBD)
 - **Requested by:** Tharak Krishnan
-- **Report status:** DRAFT, interim. The two GPU images (`ubuntu24.04-gpu-x86`, much more fully, and `ubuntu22.04-gpu-x86`) have been tested without an Akida board. `ubuntu24.04-cpu-aarch64` has been tested on a Raspberry Pi 5 with an AKD1500 board (section 4d). The other CPU and aarch64 images, the driver installer, and the Secure Boot flow are not yet tested.
-- **Last updated:** 2026-10-29 (UTC). Raspberry Pi 5 run added (section 4d, NB-4).
+- **Report status:** DRAFT, interim. The two GPU images (`ubuntu24.04-gpu-x86`, much more fully, and `ubuntu22.04-gpu-x86`) have been tested without an Akida board. `ubuntu24.04-cpu-aarch64` (section 4d) and `ubuntu22.04-cpu-aarch64` (section 4d-2) have been tested on a Raspberry Pi 5 with an AKD1500 board. The CPU x86 images were tested on a second host with a board (branch `main`). The driver installer and the Secure Boot flow are not yet tested.
+- **Last updated:** 2026-11-05 (UTC). `ubuntu22.04-cpu-aarch64` on the Raspberry Pi 5 added (section 4d-2, NB-4 update, NB-5).
 - **Plan:** [plan.md](plan.md)
 
 Rules for this file: record only what was actually run and observed. Anything not run is **Not tested**.
@@ -15,6 +15,8 @@ Rules for this file: record only what was actually run and observed. Anything no
 **What was tested.** Two images, on a Linux host with 2x NVIDIA A30 and no Akida board. `akida-devhub:ubuntu24.04-gpu-x86` was pulled, launched, and used to run one training notebook and six benchmark or evaluation notebooks from the Akida 1 model zoo. `akida-devhub:ubuntu22.04-gpu-x86` was pulled, checked against the same list, and ran three of those notebooks plus the quantize, convert and inference steps, with identical results (section 4c). The USER_GUIDE and the two READMEs supplied were read and checked against what actually happened.
 
 **Raspberry Pi 5 with a board (added 2026-10-29, section 4d).** `ubuntu24.04-cpu-aarch64` was pulled (267 s, 4.1 GB) and run on a Raspberry Pi 5 with an AKD1500 PCIe board. The container sees the board with the guide's `--privileged -v /dev:/dev`, and also with only `--device /dev/akd1500_0` and no privilege. Five of six benchmark and evaluation notebooks pass, and their hardware cells now run on the board (latency and clock cycles reported). `vww` fails the same way as on x86 (NB-1). **New finding NB-4:** `speech_commands` reports 0.9024 accuracy on the board against 0.9306 on the software device, while `plant_village` and `arrhythmia` match exactly. Power was not measured (no I2C power sensor). The test Pi also kills running containers on every SSH login (section 4d), which matters for anyone sharing it.
+
+**Raspberry Pi 5, second image (added 2026-11-05, section 4d-2).** `ubuntu22.04-cpu-aarch64` (built 2026-11-02, 3.86 GB, pulled in 258 s) was run on the same Pi and board. The board is visible with both the guide's flags and the narrow `--device /dev/akd1500_0`. **Four of five notebooks pass** with their hardware cells on the board (`imagenet` evaluation and benchmark, `arrhythmia`, `speech_commands`). **`plant_village` did not complete:** its dataset download from `data.mendeley.com` broke twice (`IncompleteRead`), and a plain `curl` from the Pi moved only 25 MB in 15 minutes, so this is a network limit on the Pi and not an image fault (NB-5). `vww` was not run again (NB-1). Timings, clock counts and sparsity match the 24.04 image exactly. **Accuracy does not:** `speech_commands` gives **0.8753** on the board with this image, against 0.9024 on the 24.04 Pi image and 0.9306 on x86 with a board, so NB-4 is wider than first thought. `arrhythmia` gives 0.9584 here and on the x86 board with the same OS (22.04), against 0.9577 on 24.04 images.
 
 **What works**
 - The image pulls (258 s), starts in about 7 s as a non-root user, and ships DevHub at the pinned commit `8be7c232` with a clean tree.
@@ -29,9 +31,9 @@ Rules for this file: record only what was actually run and observed. Anything no
 - **NB-1 (Major):** `vww_notebook_benchmark` fails out of the box. Its dataset is not in the image or downloaded by the notebook, and the README's download URL returned 403 from the test host.
 - **DOC-3, DOC-4, DOC-13 (Major):** the guide assumes a board and has no path for GPU or no-board use. It lists no host prerequisites for GPU use. The build README names notebook folders that do not exist (`akida1/notebooks/`).
 
-**Not tested.** The PCIe/M.2 driver installer and the Secure Boot flow (the Pi already had the driver loaded), board runs on x86 hosts, the other CPU and aarch64 images (`ubuntu22.04-cpu-aarch64`, both CPU x86 images), any training notebook on the 22.04 image, the three training notebooks other than `plant_village`, power measurement, other operating systems, and long-run stability. The driver installer's own README was not supplied.
+**Not tested.** The PCIe/M.2 driver installer and the Secure Boot flow (the Pi already had the driver loaded), board runs on x86 hosts (done on branch `main`), the CPU x86 images (done on `main`), the `plant_village` notebook on `ubuntu22.04-cpu-aarch64`, any training notebook on the 22.04 image, the three training notebooks other than `plant_village`, power measurement, other operating systems, and long-run stability. The driver installer's own README was not supplied.
 
-**Counts (26 items, proposed severity):** 0 blockers, 5 Major (DOC-1, DOC-3, DOC-4, DOC-13, NB-1), 16 Minor (including the new NB-4 and DOC-22), 1 Cosmetic, 3 Enhancement, and 1 checked and found fine (DOC-10).
+**Counts (27 items, proposed severity):** 0 blockers, 5 Major (DOC-1, DOC-3, DOC-4, DOC-13, NB-1), 17 Minor (including NB-4, NB-5 and DOC-22), 1 Cosmetic, 3 Enhancement, and 1 checked and found fine (DOC-10).
 
 **Acceptance criteria:** none can be called fully met yet. Criteria 1 to 3 are partial passes for the two tested GPU images. See section 2.
 
@@ -68,7 +70,7 @@ Rules for this file: record only what was actually run and observed. Anything no
 | SDK and toolchain availability | Partial pass | A30 host | akida 2.19.3, cnn2snn 2.19.3, quantizeml 1.2.5, akida_models 1.14.2, metatf 2.19.3, TensorFlow 2.19.1, Python 3.12.3. TensorFlow sees both GPUs. |
 | Examples and tutorials (Akida 1 model zoo) | Partial pass | A30 host, no board | `plant_village` training notebook: pass (4a). Benchmark and evaluation notebooks: 5 of 6 pass, `vww` fails (NB-1) (4b). The other training notebooks (arrhythmia, speech_commands, vww) were not run. Not run on a board. |
 | GPU training | Partial pass | A30 host | Host baseline passed (Phase 1). The `plant_village` training notebook ran with TensorFlow creating both A30s as devices, at about 21 to 22 ms per step. GPU utilisation was not captured during the run, so it is not independently confirmed. |
-| Akida hardware (AKD1500 PCIe/M.2) | Partial pass | Raspberry Pi 5, `ubuntu24.04-cpu-aarch64` | Board visible in the container, narrower `--device` flags work, 5 of 6 notebooks ran their hardware cells (4d). Driver installer, Secure Boot flow and power measurement not tested. Accuracy differs from software for `speech_commands` (NB-4). |
+| Akida hardware (AKD1500 PCIe/M.2) | Partial pass | Raspberry Pi 5, `ubuntu24.04-cpu-aarch64` and `ubuntu22.04-cpu-aarch64` | Board visible in the container, narrower `--device` flags work, 5 of 6 notebooks ran their hardware cells on 24.04 (4d), 4 of 5 on 22.04 (4d-2). Driver installer, Secure Boot flow and power measurement not tested. Accuracy differs from software for `speech_commands` (NB-4). |
 | Documentation | Partial | A30 host, no board | USER_GUIDE and build README followed for the GPU, no-board path (section 7). Hardware sections not followed. |
 | Stability and performance | Partial | A30 host | Pull 258 s, start about 7 s, `docker stop`/`start` cycle works, and no crashes or errors in about two hours of notebook runs. First runs took 5 to 35 minutes, mostly dataset downloads. No long-run or GPU-utilisation measurements were taken. |
 | Cross-platform | Partial | Raspberry Pi 5 (aarch64, Ubuntu 24.04) and x86 Linux | Only Linux. aarch64 tested on one image. |
@@ -189,6 +191,46 @@ So the broad flags are **not needed** on this host (DOC-5 resolved, DOC-22 below
 
 Four of the containers I started were killed, each within seconds of a new SSH login of mine, with exit code 137. The cause is a PAM hook on the host, `/etc/brainchip/ssh_notification.sh`, run on every SSH login. It stops the `lighttpd` and `jupyter-notebook` demo services and runs `docker kill` on all running containers, so that the demos do not conflict with other users of the board. On logout it restarts the services if nobody else is logged in. So: **only one SSH session at a time, and any new login (including from a colleague) ends a running test.** I worked around it by running everything inside one SSH session. This is a property of the demo machine and not of the images, but it is worth documenting for anyone testing on it. Separately: the machine already has an older `akida_demo` image and a stopped `detection_demo` container, which I did not touch.
 
+## 4d-2. Raspberry Pi 5 with an AKD1500 board: image `ubuntu22.04-cpu-aarch64` (2026-11-05)
+
+Same Pi, same board and same one-SSH-session method as 4d. The first attempt on 2026-11-03 was cut off when the Pi stopped responding during the `arrhythmia` notebook and then went offline for about two days. After the Pi rebooted its `/tmp` was empty, so the whole test was **rerun from the start** on 2026-11-05. Only the rerun is reported here.
+
+| Item | Value |
+|------|-------|
+| Host | As in 4d (Pi 5, Ubuntu 24.04, kernel 6.8.0-1007-raspi, Docker 27.0.3). 14 GB free at the start. |
+| Board | `PCIe/AKD1500/16MB/0`, 32 NPs, ip_version `BC.A1.003.009`. `/dev/akd1500_0` mode 666. |
+| Image | `bender:5000/akida-devhub:ubuntu22.04-cpu-aarch64`, ID `f0ef35ea12ea`, digest `sha256:0e3fd291f046962ddd890bb0850e8f7b2d17a3d3af933f0a9bce3594fe8857c9`, 3.86 GB, built 2026-11-02, arm64. First pull 258 s (2026-11-03, measured before the outage). The rerun found it already present (10 s). |
+| Labels | `com.brainchip.devhub-commit` 8be7c232..., `com.brainchip.metatf-version` 2.19.3, `org.opencontainers.image.version` 2.19.3 |
+
+**Inside the image:** Ubuntu 22.04.5, Python 3.10.12, aarch64, user `akida` UID/GID 1000, DevHub at `8be7c232`, clean tree. akida, cnn2snn and metatf 2.19.3, quantizeml 1.2.5, akida_models 1.14.2, TensorFlow 2.19.1, Keras 3.12.4, JupyterLab 4.6.5. Same `pip check` conflict (DOC-19). JupyterLab returns 403 without the token. `akida devices` and Python `akida.devices()` show the board.
+
+**Device passthrough:** as on 24.04, the board is visible with the guide's `--privileged -v /dev:/dev` and with only `--device /dev/akd1500_0` (1 device each). The node is mode 666 on this Pi, so the container user can open it (on a host where the node is not world-writable, see DOC-23 on branch `main`). `docker run <image> id` prints the entrypoint banner (`TensorFlow 2.19.1 - GPUs visible: 0`, `akida 2.19.3 - Akida devices found: 0`) before the command output (DOC-24, branch `main`).
+
+**Notebook runs** (one container per notebook, `--device /dev/akd1500_0`, not privileged, headless, timeout disabled):
+
+| Notebook | Result | Time | Notes |
+|----------|--------|------|-------|
+| `imagenet_akidanet_notebook_evaluation` | Pass | 187 s | 100% on the 10-image smoke test (DOC-21). Includes a 20 MB dataset download. |
+| `arrhythmia_notebook_benchmark` | Pass | 404 s | Akida accuracy **0.9584**, macro F1 0.8372. Mean inference 2.484 ms (system), 2.440 ms on chip, then 0.667 and 0.625 ms. |
+| `plant_village_notebook_benchmark` | **Did not complete** | 854 s, retry 1206 s | `ChunkedEncodingError: IncompleteRead` while downloading the dataset from `data.mendeley.com` (58 MB of 868 MB read the first time, 36 MB the second time). See NB-5. |
+| `speech_commands_notebook_benchmark` | Pass | 1752 s | Akida accuracy **0.8753** (NB-4). Mean inference 0.374 ms (system), 0.337 ms on chip (134,902 clocks), then 0.154 and 0.114 ms. |
+| `imagenet_akidanet_notebook_benchmark` | Pass | 518 s | Mean inference 142.8 ms (system), 133.4 ms on chip (53.4 M clocks), then 119.7 ms in the third mapping. |
+
+No error outputs in the four passing notebooks (counted in the executed notebooks). `vww_notebook_benchmark` was **not run** on this image. Power was not measured (no I2C INA sensor).
+
+**Comparison with the 24.04 Pi image (4d):** timings, on-chip clock counts and activation sparsity are the same in every benchmark. Accuracy differs in two notebooks, and in both the 22.04 value is shared with another machine:
+
+| Notebook | 24.04, Pi (older build) | 22.04, Pi | 24.04, x86 + board (orion) | 22.04, x86 + board (orion) |
+|----------|------------------------|-----------|---------------------------|---------------------------|
+| `arrhythmia` accuracy | 0.9577 | 0.9584 | 0.9577 | 0.9584 |
+| `speech_commands` accuracy | 0.9024 | 0.8753 | 0.9306 | not run |
+
+So the `arrhythmia` difference follows the OS of the image (24.04 against 22.04), not the machine. The `speech_commands` difference does not follow either: the same board gives 0.9024 and 0.8753 on the Pi, and 0.9306 on the x86 host.
+
+**Disk:** free space stayed at 14 GB between notebooks because each container was removed after its notebook. `speech_commands` needs about 11 GB while it runs (13 GB guard in the script, not triggered).
+
+**Dataset download check (2026-11-05).** After the second `plant_village` failure I downloaded the same file from the Pi with plain `curl`: `https://data.mendeley.com/public-files/datasets/tywbtsjrjv/files/.../file_downloaded` (DNS 162.159.133.86). After 15 minutes it had 25 MB of 868 MB (about 28 KB/s) and was stopped by my timeout. The other datasets downloaded on this Pi without trouble (`data.brainchip.com` for `imagenet_like`, PhysioNet for `arrhythmia`, and the `speech_commands` data), and `plant_village` downloaded fine on the Pi on 2026-10-29 (24.04 run, 115 s dataset cell) and on the x86 hosts. Not known: whether the slowness is the Pi's route to Mendeley today or Mendeley throttling.
+
 ## 5. Observations before testing
 
 These come from reading the Jira ticket, not from running the images.
@@ -206,7 +248,8 @@ Findings from the notebook runs (NB-n) are below. Findings about documents and t
 |----|----------------|------|---------|
 | NB-1 | **Major** | Examples | `vww_notebook_benchmark` fails out of the box. The dataset is not in the image and is not downloaded by the notebook, and the README's download URL returned 403 from this host. |
 | NB-2 | Minor | Examples | The first run of `arrhythmia_notebook_benchmark` takes 35 minutes in one silent cell. **Cause confirmed:** the PhysioNet download (36 min for 94 MB at about 43 KB/s from this host). The preprocessing takes 41 s, as the docstring says. |
-| NB-4 | Minor (owners to assess) | Examples, hardware | `speech_commands_notebook_benchmark` reports **0.9024** Akida accuracy on the AKD1500 (Raspberry Pi 5) against **0.9306** on the software device (x86, same notebook and pretrained model). `plant_village` (0.9943) and `arrhythmia` (0.9577) match exactly. Cause not established. |
+| NB-4 | Minor (owners to assess) | Examples, hardware | `speech_commands_notebook_benchmark` reports **0.9024** Akida accuracy on the AKD1500 (Raspberry Pi 5) against **0.9306** on the software device (x86, same notebook and pretrained model). `plant_village` (0.9943) and `arrhythmia` (0.9577) match exactly. Cause not established. **Update 2026-11-05:** the 22.04 aarch64 image gives **0.8753** on the same board, so the number varies between runs and images (0.9024, 0.8753, and 0.9306 on x86 with a board). |
+| NB-5 | Minor | Examples | `plant_village_notebook_benchmark` downloads its dataset (868 MB) from `data.mendeley.com`, and from the Raspberry Pi the download broke twice (`IncompleteRead`) and ran at about 28 KB/s in a plain `curl` test. The notebook then fails with no retry. Other datasets come from `data.brainchip.com` or PhysioNet and downloaded fine. Suggest a BrainChip mirror like the one `imagenet_like` already has. |
 | NB-3 | Minor | Examples | The Akida evaluation loop in `plant_village_notebook_benchmark` takes 355 s on the software device because it calls `predict(batch, batch_size=1)`. The training notebook uses `batch_size=BATCH_SIZE` (32) and took about 16 s. **Cause confirmed.** |
 
 ### NB-1: `vww_notebook_benchmark` fails because the dataset is missing (Major)
@@ -282,6 +325,22 @@ Suggested check: in one session on the Pi, evaluate the same val_ds with the mod
 ```
 
 Why it matters: the benchmark notebooks are presented as showing that the hardware matches the software model. If this is a real divergence for the AKD1500, it should be known. If it is a data difference, the notebook output cannot be compared across machines. The image is probably not the cause, because the package versions are identical.
+
+**Update 2026-11-05 (section 4d-2).** `ubuntu22.04-cpu-aarch64` on the same Pi and board gives **0.8753**. Timings, on-chip clock counts (134,902) and sparsity are identical to the 24.04 run, so the model and its mapping are the same. Results for the same notebook now: Pi, 24.04 image (older build): 0.9024. Pi, 22.04 image: 0.8753. x86 host with a board (orion), 24.04: 0.9306. x86 software device, 24.04: 0.9306. The x86 results are repeatable and equal; the Pi results are lower and differ from each other. That points at something on the Pi or on aarch64 (for example how the validation data is prepared, or run-to-run variation in the board results), not at the notebook's model. **Not checked:** the validation sample count on each side, and software against hardware in the same session on the Pi. That same-session check is the next step.
+
+### NB-5: `plant_village` dataset download is unreliable from the Raspberry Pi (Minor)
+
+```
+Area:          Examples (akida1/model_zoo/plant_village), dataset download
+Observed:      plant_village_notebook_benchmark on ubuntu22.04-cpu-aarch64, Raspberry Pi 5, 2026-11-05, two attempts:
+               ChunkedEncodingError: Connection broken: IncompleteRead(58372912 bytes read, 809659650 more expected)
+               ChunkedEncodingError: Connection broken: IncompleteRead(35697346 bytes read, 832335216 more expected)
+               Plain curl of the same URL from the Pi: 25 MB in 15 minutes.
+Source:        https://data.mendeley.com/public-files/datasets/tywbtsjrjv/... (found with tfds builder url_infos)
+Not known:     Whether the Pi's route to Mendeley is the cause today, or Mendeley throttling. The same notebook downloaded fine on this Pi on 2026-10-29.
+Suggested fix: host the dataset on the BrainChip mirror (as for imagenet_like), or let the notebook retry and resume.
+```
+
 
 ### Known issues, not counted as findings
 
@@ -410,7 +469,7 @@ In priority order. Items 1 to 4 are small changes. Item 5 is testing that needs 
 - Was `ubuntu22.04-gpu-x86` validated by the build team? It worked in these tests, but the parent README lists five combinations and six are built.
 - Can the driver installer README be shared for review?
 
-**Testing still to do:** `ubuntu22.04-cpu-aarch64` and the two CPU x86 images, the driver installer and Secure Boot flow, the other training notebooks (and any training notebook on the 22.04 image), power measurement, the NB-4 check, and longer stability runs.
+**Testing still to do:** `plant_village` on `ubuntu22.04-cpu-aarch64` (needs a working dataset download, NB-5), the driver installer and Secure Boot flow, the other training notebooks (and any training notebook on the 22.04 image), power measurement, the NB-4 same-session check (software and board on the Pi in one session), and longer stability runs.
 
 ## 9. Test log
 
@@ -457,3 +516,9 @@ _Commands run and their results will be appended here in order._
 | 2026-10-29 | Batch run in one SSH session (`wrapper_pi.sh`, in the scratchpad): 6 notebooks, 5400 s cap each, container `akida-rpi-nb` | 5 pass, `vww` fails (NB-1). 454, 107, 1374, 13, 724 and 424 s. Evidence bundle (executed notebooks and logs) pulled back through the same session. |
 | 2026-10-29 | Analysis of the executed notebooks | Hardware cells ran. Accuracy: `plant_village` 0.9943, `arrhythmia` 0.9577, `speech_commands` 0.9024 (x86 software: 0.9306, NB-4). No error outputs. No I2C power sensor. |
 | 2026-10-29 | Cleanup: removed `akida-rpi-nb` (end of the batch script). Kept the pulled image on the Pi. | Done. The older `akida_demo` image and `detection_demo` container were not touched. |
+| 2026-11-03 | Pull `bender:5000/akida-devhub:ubuntu22.04-cpu-aarch64` on the Pi, device flag tests A and B, banner check, default start, then notebooks in one SSH session (`wrapper_pi22.sh`) | Pull 258 s, ID `f0ef35ea12ea`, 3.86 GB. Both flag sets show 1 device. `imagenet` evaluation passed (107 s). The SSH session timed out during `arrhythmia` (server not responding) and the Pi then went offline. These results were lost with the Pi's `/tmp` and are not reported. |
+| 2026-11-04 to 2026-11-05 | Pi unreachable (no ping, port 22 closed), checked repeatedly from this host and from orion | Back on 2026-11-05 (uptime 9 minutes: it had rebooted, `/tmp` empty). Image, `/dev/akd1500_0` and 14 GB free intact. |
+| 2026-11-05 | Full rerun, detached on the Pi with `nohup` (`wrapper_pi22.sh`) | Flags A and B: 1 device each. 4 of 5 notebooks pass (187, 404, 1752 and 518 s). `plant_village` failed after 854 s on a dataset download error. |
+| 2026-11-05 | Retry `plant_village` alone (`retry_pv.sh`) | Failed again after 1206 s, same `IncompleteRead` (NB-5). |
+| 2026-11-05 | Standalone `curl` of the Mendeley dataset URL from the Pi (`dlcheck.sh`) | 25 MB in 15 minutes (about 28 KB/s). Stopped by the 900 s timeout. |
+| 2026-11-05 | Compared executed notebooks, 22.04 Pi against 24.04 Pi, and against orion | Timings, clock counts and sparsity identical. `arrhythmia` 0.9584 (matches orion 22.04), `speech_commands` 0.8753 (NB-4 widened). |

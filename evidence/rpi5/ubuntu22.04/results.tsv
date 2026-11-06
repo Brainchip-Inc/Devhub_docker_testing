@@ -1,0 +1,7 @@
+notebook	exit	seconds	note
+imagenet_akidanet_notebook_evaluation	0	187	
+arrhythmia_notebook_benchmark	0	404	
+plant_village_notebook_benchmark	1	854	dataset download from data.mendeley.com broke (IncompleteRead)
+plant_village_notebook_benchmark_retry	1	1206	same error again
+speech_commands_notebook_benchmark	0	1752	
+imagenet_akidanet_notebook_benchmark	0	518	

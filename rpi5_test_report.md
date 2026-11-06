@@ -1,7 +1,8 @@
-# Raspberry Pi 5 test report: Akida Docker image `ubuntu24.04-cpu-aarch64`
+# Raspberry Pi 5 test report: Akida Docker images `ubuntu24.04-cpu-aarch64` and `ubuntu22.04-cpu-aarch64`
 
-REQ-TOOL-005 / AK-7557. Tester: Ali Kayyam. Date: 2026-10-29.
-Full detail: `report.md` section 4d. Evidence: `evidence/rpi5/`.
+REQ-TOOL-005 / AK-7557. Tester: Ali Kayyam. Dates: 2026-10-29 (24.04), 2026-11-05 (22.04).
+Full detail: `report.md` sections 4d and 4d-2. Evidence: `evidence/rpi5/` (24.04) and `evidence/rpi5/ubuntu22.04/`.
+The first half of this file is the 24.04 image. The 22.04 image is in the section "Image `ubuntu22.04-cpu-aarch64`" below.
 
 ## Result
 
@@ -48,9 +49,58 @@ No error cells in the five passing notebooks.
 ## Not tested
 
 - Driver installer and Secure Boot flow (the driver was already loaded on the Pi)
-- `ubuntu22.04-cpu-aarch64`
+- `plant_village` on `ubuntu22.04-cpu-aarch64` (its dataset download failed, see below)
+- A same-session check of board against software accuracy on the Pi (NB-4)
 - Power measurement (the Pi has no I2C power sensor)
 - Training notebooks (the aarch64 image is inference-only)
+
+## Image `ubuntu22.04-cpu-aarch64` (2026-11-05)
+
+### Result
+
+**Works on the same Pi and board.** The board is visible with both flag sets, and **4 of 5** notebooks pass with their hardware cells on the board. `plant_village` did not complete because its dataset download failed twice (NB-5). `vww` was not run. Timings match the 24.04 image. Accuracy differs for `speech_commands` (0.8753, NB-4) and, slightly, for `arrhythmia` (0.9584).
+
+### What was tested
+
+| Item | Value |
+|------|-------|
+| Image | `akida-devhub:ubuntu22.04-cpu-aarch64`, ID `f0ef35ea12ea`, digest `sha256:0e3fd291...57c9`, 3.86 GB, built 2026-11-02, Python 3.10.12, Keras 3.12.4, JupyterLab 4.6.5 |
+| Host and board | As above (same Pi, same `PCIe/AKD1500/16MB/0`) |
+| Pull | 258 s (2026-11-03) |
+| History | The first attempt (2026-11-03) was cut off when the Pi stopped responding, and the Pi was offline for about two days. After it rebooted the whole test was rerun from the start on 2026-11-05. Only the rerun is reported. |
+
+### Results
+
+| Check | Result |
+|-------|--------|
+| Container contents | Pass. akida 2.19.3, DevHub at `8be7c232`, same `pip check` conflict (DOC-19), 403 without the Jupyter token. |
+| Board visible, guide's flags | Pass (1 device) |
+| Board visible, `--device /dev/akd1500_0` only | Pass (1 device) |
+
+| Notebook | Result | Time | Key numbers |
+|----------|--------|------|-------------|
+| `imagenet_akidanet_notebook_evaluation` | Pass | 187 s | 10-image smoke test (100%) |
+| `arrhythmia_notebook_benchmark` | Pass | 404 s | Accuracy 0.9584. 2.484 ms per inference |
+| `plant_village_notebook_benchmark` | **Did not complete** | 854 s, retry 1206 s | Dataset download from `data.mendeley.com` broke twice (`IncompleteRead`) |
+| `speech_commands_notebook_benchmark` | Pass | 1752 s | Accuracy 0.8753 (NB-4). 0.374 ms per inference |
+| `imagenet_akidanet_notebook_benchmark` | Pass | 518 s | 142.8 ms per inference (133.4 ms on chip) |
+| `vww_notebook_benchmark` | Not run | | |
+
+No error outputs in the four passing notebooks. Power was not measured.
+
+### Comparison with other runs of the same notebooks
+
+| Notebook | 24.04, Pi | 22.04, Pi | 24.04, x86 + board | 22.04, x86 + board |
+|----------|-----------|-----------|--------------------|--------------------|
+| `arrhythmia` accuracy | 0.9577 | 0.9584 | 0.9577 | 0.9584 |
+| `speech_commands` accuracy | 0.9024 | 0.8753 | 0.9306 | not run |
+
+Timings, on-chip clock counts and sparsity are identical between the two Pi images. The `arrhythmia` difference follows the image's OS, not the machine. The `speech_commands` difference does not: the Pi gives two different values and the x86 host gives a third.
+
+### New and changed findings
+
+- **NB-4 (Minor, widened):** the Pi gives 0.9024 and 0.8753 for `speech_commands` with two different images, and x86 with a board gives 0.9306. Next step: software and board on the same data in one session on the Pi, and the validation sample counts.
+- **NB-5 (Minor, new):** the `plant_village` dataset (868 MB) comes from `data.mendeley.com`. From the Pi two attempts broke (58 MB and 36 MB read), and a plain `curl` moved 25 MB in 15 minutes (about 28 KB/s). Other datasets downloaded fine. It worked on this Pi on 2026-10-29. Suggest a BrainChip mirror, as for `imagenet_like`, or a retry in the notebook. Not known: whether the cause is today's route from the Pi or throttling at Mendeley.
 
 ## Note for anyone using this Pi
 

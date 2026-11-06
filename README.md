@@ -4,17 +4,19 @@ Internal beta test of the official Akida Docker images with DevHub pre-installed
 (REQ-TOOL-005, Jira [AK-7557](https://brainchip.atlassian.net/browse/AK-7557)).
 
 **Status: interim.** Two GPU images were tested on a host with no Akida board. `ubuntu24.04-cpu-aarch64`
-was tested on a Raspberry Pi 5 with an AKD1500 board (branch `test/rpi5-aarch64-images`). The other CPU
-images, the driver installer and the Secure Boot flow are not yet tested.
+and `ubuntu22.04-cpu-aarch64` were tested on a Raspberry Pi 5 with an AKD1500 board (this branch,
+`test/rpi5-aarch64-images`). The CPU x86 images are on branch `main`. The driver installer and the Secure
+Boot flow are not yet tested.
 
 ## What is here
 
 | File | What it is |
 |------|------------|
-| [report.md](report.md) | The test report: summary, acceptance criteria, notebook results, 26 findings, documentation fixes, recommendations and the full test log. **Start here.** |
+| [report.md](report.md) | The test report: summary, acceptance criteria, notebook results, 27 findings, documentation fixes, recommendations and the full test log. **Start here.** |
 | [plan.md](plan.md) | The test plan: objectives, phases, and facts taken from AK-7557. |
 | [running_notebooks_and_python_in_docker.md](running_notebooks_and_python_in_docker.md) | Customer-facing how-to: start the image, run the notebooks (browser or command line) and your own Python scripts. Commands were checked on an x86 GPU host. |
-| [evidence/rpi5/](evidence/rpi5/) | Raspberry Pi 5 run: results table, notebook run logs, device checks, and the scripts used. Executed notebooks are not copied (internal content). |
+| [rpi5_test_report.md](rpi5_test_report.md) | Standalone report for both aarch64 images on the Raspberry Pi 5. |
+| [evidence/rpi5/](evidence/rpi5/) | Raspberry Pi 5 runs: results tables, notebook run logs, device checks, and the scripts used. `ubuntu22.04/` holds the 22.04 run. Executed notebooks are not copied (internal content). |
 | [jira_comment_draft.md](jira_comment_draft.md) | Draft feedback comment for AK-7557. It is a draft and has not been posted. |
 
 The documents under test (USER_GUIDE and the READMEs in `akida_docker/metatf_public_images`) are
@@ -36,8 +38,13 @@ with 2x NVIDIA A30 and no Akida board.
   with their hardware cells running on the board. `vww` fails as on x86 (NB-1). New: `speech_commands`
   accuracy is 0.9024 on the board against 0.9306 on the software device (NB-4). Power was not measured.
   The test Pi kills running containers on every SSH login, so use one session at a time.
-- **Not tested:** the driver installer, the Secure Boot flow, boards in x86 hosts, `ubuntu22.04-cpu-aarch64`,
-  the CPU x86 images, power measurement, and the other training notebooks. Those are reported as
+- **Raspberry Pi 5 + AKD1500 (`ubuntu22.04-cpu-aarch64`, 2026-11-05):** same result for the board (visible with
+  both flag sets). 4 of 5 notebooks run on the board and pass. `plant_village` did not complete: its dataset
+  download from `data.mendeley.com` broke twice and a plain `curl` from the Pi moved 25 MB in 15 minutes (NB-5).
+  `speech_commands` accuracy is **0.8753** here, 0.9024 on the 24.04 image and 0.9306 on x86 with a board, so
+  NB-4 is wider than first thought. Timings are identical between the two images.
+- **Not tested:** the driver installer, the Secure Boot flow, `plant_village` on `ubuntu22.04-cpu-aarch64`,
+  power measurement, and the other training notebooks. The CPU x86 images and boards in x86 hosts are on `main`. Those are reported as
   **not tested**, not as passed.
 
 See [report.md](report.md) for evidence, severities and suggested fixes.
