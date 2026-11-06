@@ -4,9 +4,10 @@ Internal beta test of the official Akida Docker images with DevHub pre-installed
 (REQ-TOOL-005, Jira [AK-7557](https://brainchip.atlassian.net/browse/AK-7557)).
 
 **Status: interim.** Two GPU images were tested on a host with no Akida board, and the two x86 CPU
-images were tested with an AKD1500 board. The Raspberry Pi image is on a separate branch (see the
-table below). The floating tags have been rebuilt since the first tests, so check the digests in each
-report. Not yet tested: `ubuntu22.04-cpu-aarch64` and the PCIe driver installer.
+images were tested with an AKD1500 board. The two aarch64 images were tested on a Raspberry Pi 5 with
+an AKD1500 board, and their results are on a separate branch (see the table below). The floating tags
+have been rebuilt since the first tests, so check the digests in each report. Not yet tested: the PCIe
+driver installer.
 
 ## Image status
 
@@ -21,12 +22,14 @@ with an AKD1500 board. The six images in scope are the floating tags of `akida-d
 | `ubuntu22.04-gpu-x86` | Yes, partly (build of 2026-10-14) | GPU host | No | 3 notebooks and the quantize and convert steps pass, matching 24.04. No training notebook was run. | `main`: [report.md](report.md), section 4c |
 | `ubuntu24.04-cpu-x86` | Yes (build of 2026-11-02) | `orion` | Yes, AKD1500 | 5 of 6 notebooks pass on the board. `vww` fails (NB-1). Needs `--group-add 0` (DOC-23). | `main`: [report.md](report.md) section 4e, [orion_x86_board_test_report.md](orion_x86_board_test_report.md) |
 | `ubuntu22.04-cpu-x86` | Yes, partly (build of 2026-11-02) | `orion` | Yes, AKD1500 | 3 notebooks run, all pass. The other 3 were not run. Needs `--group-add 0` (DOC-23). | `main`: same as above |
-| `ubuntu24.04-cpu-aarch64` | Yes (older build, pulled 2026-10-29) | Raspberry Pi 5 | Yes, AKD1500 | 5 of 6 notebooks pass. `vww` fails. `speech_commands` accuracy differs (NB-4). | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged |
-| `ubuntu22.04-cpu-aarch64` | **No** | | | | |
+| `ubuntu24.04-cpu-aarch64` | Yes (older build, pulled 2026-10-29) | Raspberry Pi 5 | Yes, AKD1500 | 5 of 6 notebooks pass. `vww` fails. `speech_commands` accuracy 0.9024 against 0.9306 on x86 (NB-4). | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged: `rpi5_test_report.md`, `report.md` section 4d |
+| `ubuntu22.04-cpu-aarch64` | Yes, partly (build of 2026-11-02, tested 2026-11-05) | Raspberry Pi 5 | Yes, AKD1500 | 4 of 5 notebooks pass on the board. `plant_village` did not complete: its dataset download from `data.mendeley.com` broke twice (NB-5). `vww` not run. `speech_commands` accuracy 0.8753 (NB-4). | Branch [`test/rpi5-aarch64-images`](https://github.com/Brainchip-Inc/Devhub_docker_testing/tree/test/rpi5-aarch64-images), not yet merged: `rpi5_test_report.md`, `report.md` section 4d-2 |
 | `akida-pcie-driver-installer` (24.04 and 22.04) | **No** | | | | Needs a fresh machine with a board, and its README |
 
-Five of the six images have been run. The GPU images and the Pi image have been rebuilt since they were
-tested, so those results describe the older builds.
+All six images have been run, and four of them only partly. The PCIe driver installer has not. The GPU
+images and `ubuntu24.04-cpu-aarch64` have been rebuilt since they were tested, so those results describe
+the older builds. The findings from the Pi runs (NB-4, NB-5, DOC-22) are in the Pi branch's `report.md`,
+not in the `report.md` on `main`, until the branch is merged.
 
 ## What is here
 
@@ -42,11 +45,13 @@ internal-only and are **not** copied into this repo. The report names the versio
 
 ## Results at a glance
 
-Tested on two machines:
+Tested on three machines (the third, a Raspberry Pi 5, is described on its branch):
 
 - **GPU host** (2x NVIDIA A30, no Akida board): `akida-devhub:ubuntu24.04-gpu-x86` (in depth, including
   a training notebook) and `ubuntu22.04-gpu-x86`.
 - **`orion`** (x86, no GPU, AKD1500 board): `ubuntu24.04-cpu-x86` and `ubuntu22.04-cpu-x86`.
+- **Raspberry Pi 5** (aarch64, AKD1500 board): `ubuntu24.04-cpu-aarch64` and `ubuntu22.04-cpu-aarch64`
+  (branch `test/rpi5-aarch64-images`).
 
 - **Works (GPU host):** pull and start, GPU access without `--privileged`, JupyterLab with token,
   DevHub at the pinned commit, one full training notebook (`plant_village`), and 5 of 6 benchmark
@@ -58,8 +63,13 @@ Tested on two machines:
 - **With a board (x86 CPU images):** both find the board and run the notebooks on it, but only as
   root or with an extra `--group-add 0`. With the guide's flags the container user sees no board and
   nothing says why (DOC-23, proposed Major).
-- **Not tested:** `ubuntu22.04-cpu-aarch64`, the PCIe driver installer, the GPU images with a board,
-  and the other training notebooks. Those are reported as **not tested**, not as passed.
+- **With a board (Raspberry Pi 5, branch `test/rpi5-aarch64-images`):** both aarch64 images find the
+  board, also with only `--device /dev/akd1500_0`. Benchmark notebooks run on the board: 5 of 6 on 24.04
+  and 4 of 5 on 22.04. Timings are identical between the two images. `speech_commands` accuracy on the
+  board varies: 0.9024 (24.04, Pi), 0.8753 (22.04, Pi) and 0.9306 (x86 with a board), which is open
+  (NB-4). The `plant_village` dataset download from `data.mendeley.com` fails from the Pi (NB-5).
+- **Not tested:** the PCIe driver installer, the GPU images with a board, `plant_village` on
+  `ubuntu22.04-cpu-aarch64`, and the other training notebooks. Those are reported as **not tested**, not as passed.
 
 See [report.md](report.md) for evidence, severities and suggested fixes.
 
